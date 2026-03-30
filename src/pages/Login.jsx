@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import Input from '../components/Input'
+import trustaLogo from '../assets/trusta-logo-final.png'
 
 function Login() {
   return (
     <div className="auth-page page-load">
       <div className="auth-overlay" />
       <section className="auth-card card-glass">
-        <p className="eyebrow">Welcome Back</p>
-        <h1>Login to Trusta</h1>
+        <div className="auth-brand-top">
+          <img src={trustaLogo} alt="Trusta Bank" className="auth-logo" />
+          <p className="eyebrow">Welcome Back</p>
+          <h1>Login to Trusta</h1>
+        </div>
 
         <form className="auth-form">
           <Input
@@ -28,6 +32,7 @@ function Login() {
             placeholder="Enter your password"
             name="password"
             autoComplete="current-password"
+            enablePasswordToggle
             required
           />
 
@@ -40,6 +45,10 @@ function Login() {
           <Button type="submit" fullWidth>
             Login
           </Button>
+
+          <p className="auth-notice auth-notice-danger">
+            Security notice: login is temporarily locked after 5 failed attempts.
+          </p>
         </form>
 
         <p className="auth-footnote">

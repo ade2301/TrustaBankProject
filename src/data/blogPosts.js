@@ -9,6 +9,7 @@ export const blogPosts = [
     date: 'Mar 28, 2026',
     author: 'Olivia Chen',
     readTime: '6 min read',
+    thumbnail: 'https://i.pinimg.com/1200x/52/ce/ab/52ceab112d95fa1e1f1519f8abc3b30c.jpg',
     coverLabel: 'Budgeting and savings',
     content: [
       'Building better money habits does not start with a huge salary. It starts with a repeatable routine. One of the most effective methods is separating your income as soon as it lands. Split funds into essentials, savings, and personal spending before any impulse purchase can happen.',
@@ -26,6 +27,7 @@ export const blogPosts = [
     date: 'Mar 25, 2026',
     author: 'Dev Patel',
     readTime: '7 min read',
+    thumbnail: 'https://i.pinimg.com/736x/29/47/3b/29473b11e60ae43cf2a71c55027407b5.jpg',
     coverLabel: 'Monthly planning',
     content: [
       'A useful budget is one you can follow in real life, not one that looks perfect on paper. Start by tracking your spending for one month. This gives you real numbers instead of assumptions.',
@@ -43,6 +45,7 @@ export const blogPosts = [
     date: 'Mar 22, 2026',
     author: 'Tunde Adeyemi',
     readTime: '8 min read',
+    thumbnail: 'https://i.pinimg.com/736x/87/88/d5/8788d54d20778e7d84dfa627b53d0ed4.jpg',
     coverLabel: 'Freelance finance',
     content: [
       'Freelance income can be unpredictable, so your financial structure should be predictable. Create separate wallets for operating expenses, taxes, and savings. When a payment arrives, split it immediately based on your chosen percentages.',
@@ -60,6 +63,7 @@ export const blogPosts = [
     date: 'Mar 20, 2026',
     author: 'Zainab Hassan',
     readTime: '6 min read',
+    thumbnail: 'https://i.pinimg.com/736x/35/3f/49/353f4944093a80737222be1e4312db6e.jpg',
     coverLabel: 'Account protection',
     content: [
       'Security starts with user behavior. Strong unique passwords, biometric lock, and two-step verification remain your first line of defense. Most account incidents happen because these basics were skipped.',
@@ -77,6 +81,7 @@ export const blogPosts = [
     date: 'Mar 18, 2026',
     author: 'Marcus Johnson',
     readTime: '5 min read',
+    thumbnail: 'https://i.pinimg.com/1200x/7a/a4/fe/7aa4fea018cdab1a0391bad30f6cf9ea.jpg',
     coverLabel: 'Goal tracking',
     content: [
       'The biggest reason savings goals fail is that they are too vague. Instead of saying I want to save more, define one target with a clear amount and date. Example: save N300,000 in 10 months for a business setup.',
@@ -94,6 +99,7 @@ export const blogPosts = [
     date: 'Mar 15, 2026',
     author: 'Trusta Team',
     readTime: '4 min read',
+    thumbnail: 'https://i.pinimg.com/736x/c1/c3/76/c1c376c026ffd22bfa6452f9f9fe2812.jpg',
     coverLabel: 'Platform updates',
     content: [
       'This month, we improved transfer confirmation speed and redesigned transaction details for clearer status visibility. Users now see pending, processing, and completed states more transparently.',

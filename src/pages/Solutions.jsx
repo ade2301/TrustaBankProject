@@ -1,7 +1,6 @@
 import Card from '../components/Card'
 import Button from '../components/Button'
 import RevealSection from '../components/RevealSection'
-import CardLogo from '../components/CardLogo'
 
 const solutions = [
   {
@@ -44,16 +43,12 @@ function Solutions() {
         <div className="solutions-grid">
           {solutions.map((item) => (
             <Card key={item.title} className="solution-card card-glass">
-              <CardLogo />
               <p className="solution-kicker">{item.subtitle}</p>
               <h3>{item.title}</h3>
               <p className="plan-desc">{item.description}</p>
               <ul className="features-list">
                 {item.points.map((point) => (
-                  <li key={point}>
-                    <span className="checkmark">✓</span>
-                    {point}
-                  </li>
+                  <li key={point}>{point}</li>
                 ))}
               </ul>
             </Card>
@@ -64,32 +59,32 @@ function Solutions() {
       <RevealSection className="section" delay={0.15}>
         <Card className="faq-highlight card-glass">
           <h2>Why this works for Nigeria</h2>
-          <div className="faq-grid">
-            <div className="faq-item">
+          <ul className="faq-grid">
+            <li className="faq-item">
               <h4>Optimized for local rails</h4>
               <p>Built with local transfer flows, instant notifications, and seamless wallet funding options.</p>
-            </div>
-            <div className="faq-item">
+            </li>
+            <li className="faq-item">
               <h4>Security-first controls</h4>
               <p>Biometric checks, OTP verification, and real-time risk monitoring protect every transaction.</p>
-            </div>
-            <div className="faq-item">
+            </li>
+            <li className="faq-item">
               <h4>Designed for mobile users</h4>
               <p>Simple app-first interactions for quick actions, even on lower bandwidth connections.</p>
-            </div>
-            <div className="faq-item">
+            </li>
+            <li className="faq-item">
               <h4>Scale-ready for merchants</h4>
               <p>From solo vendors to larger teams, tools are built to grow with your business.</p>
-            </div>
-            <div className="faq-item">
+            </li>
+            <li className="faq-item">
               <h4>Built for unstable networks</h4>
               <p>Fast-loading flows and resilient retries help users complete actions on weak connections.</p>
-            </div>
-            <div className="faq-item">
+            </li>
+            <li className="faq-item">
               <h4>Transparent transaction tracking</h4>
               <p>Clear pending and completed states keep users informed and reduce support-related confusion.</p>
-            </div>
-          </div>
+            </li>
+          </ul>
           <div className="solutions-cta">
             <Button to="/register">Open a Trusta Account</Button>
           </div>

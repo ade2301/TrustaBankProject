@@ -29,7 +29,11 @@ function Blog() {
                                     <span className="category-tag">{post.category}</span>
                                     <span className="read-time">{post.readTime}</span>
                                 </div>
-                                <h3>{post.title}</h3>
+                                <h3>
+                                    <Link to={`/blog/${post.slug}`} className="blog-title-link">
+                                        {post.title}
+                                    </Link>
+                                </h3>
                                 <p>{post.excerpt}</p>
                                 <div className="blog-footer">
                                     <span className="author">{post.author}</span>

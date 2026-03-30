@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import Card from '../components/Card'
@@ -78,6 +80,34 @@ const steps = [
 ]
 
 function Home() {
+  const [storeModal, setStoreModal] = useState({ open: false, store: '' })
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setStoreModal({ open: false, store: '' })
+      }
+    }
+
+    if (storeModal.open) {
+      document.body.style.overflow = 'hidden'
+      window.addEventListener('keydown', onKeyDown)
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [storeModal.open])
+
+  const openStoreModal = (store) => {
+    setStoreModal({ open: true, store })
+  }
+
+  const closeStoreModal = () => {
+    setStoreModal({ open: false, store: '' })
+  }
+
   return (
     <div className="page page-load">
       <RevealSection className="hero-section home-hero-mobile" delay={0.1}>
@@ -94,14 +124,24 @@ function Home() {
             </Button>
           </div>
           <div className="download-row hero-seq hero-4">
-            <a href="#" className="store-chip" aria-label="Download on App Store">
+            <button
+              type="button"
+              className="store-chip store-chip-btn"
+              aria-label="Download on App Store"
+              onClick={() => openStoreModal('App Store')}
+            >
               <span></span>
               <small>App Store</small>
-            </a>
-            <a href="#" className="store-chip" aria-label="Get it on Google Play">
+            </button>
+            <button
+              type="button"
+              className="store-chip store-chip-btn"
+              aria-label="Get it on Google Play"
+              onClick={() => openStoreModal('Google Play')}
+            >
               <span>▶</span>
               <small>Google Play</small>
-            </a>
+            </button>
           </div>
           <div className="hero-meta-strip hero-seq hero-4">
             <span className="stat-chip">5M+ transfers monthly</span>
@@ -197,6 +237,23 @@ function Home() {
           <Link to="/about"> Learn more about our mission.</Link>
         </p>
       </RevealSection>
+
+      {storeModal.open &&
+        createPortal(
+          <div className="store-modal-overlay" role="presentation" onClick={closeStoreModal}>
+            <div className="store-modal card-glass" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+              <p className="eyebrow">Mobile App Update</p>
+              <h3>{storeModal.store} is not available yet</h3>
+              <p>
+                We're finalizing release checks and approvals. The app will be available soon, and we appreciate your patience.
+              </p>
+              <button type="button" className="btn btn-primary" onClick={closeStoreModal}>
+                Close
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

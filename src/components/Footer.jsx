@@ -66,7 +66,7 @@ function Footer() {
           <h4>Legal</h4>
           <ul className="footer-links">
             <li>
-              <Link to="/about">Privacy Policy</Link>
+              <Link to="/privacy-policy">Privacy Policy</Link>
             </li>
             <li>
               <Link to="/about">Terms of Service</Link>
@@ -75,7 +75,7 @@ function Footer() {
               <Link to="/features">Compliance</Link>
             </li>
             <li>
-              <Link to="/contact">Cookie Settings</Link>
+              <Link to="/cookie-policy">Cookie Settings</Link>
             </li>
           </ul>
         </div>
@@ -94,7 +94,7 @@ function Footer() {
             <button type="submit">Subscribe</button>
           </form>
           <div className="social-links">
-            <a href="#" aria-label="Twitter">
+            <a href="https://x.com/dev_ojurithm" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M4.2 4h3.5l4.8 6.5L17.9 4h2l-6.5 7.5L20 20h-3.5l-5.2-7.1L5.4 20h-2.1l7-8.1L4.2 4Z"
@@ -110,7 +110,7 @@ function Footer() {
                 />
               </svg>
             </a>
-            <a href="#" aria-label="Instagram">
+            <a href="https://www.instagram.com/ad3mola.404" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.4" stroke="currentColor" strokeWidth="1.9" />
                 <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.9" />

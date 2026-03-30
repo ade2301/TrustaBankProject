@@ -20,19 +20,19 @@ const contactMethods = [
     {
         title: 'Phone Support',
         description: 'Call us directly',
-        contact: '+234 (0) 1 234 5678',
+        contact: '08067110127',
         response: 'Business hours: 8am-6pm WAT',
     },
     {
         title: 'Social Media',
         description: 'Follow our updates',
-        contact: '@trustabank_ng',
-        response: 'Chat on X, Instagram, Facebook',
+        contact: '@dev_ojurithm | @ad3mola.404',
+        response: 'Chat on X and Instagram',
     },
     {
         title: 'WhatsApp Support',
         description: 'Quick support on chat',
-        contact: '+234 801 234 5678',
+        contact: '08067110127',
         response: 'Typical response: under 5 mins',
     },
     {
@@ -121,12 +121,12 @@ function Contact() {
                         <div className="office">
                             <h4>Lagos Head Office</h4>
                             <p>Ikoyi, Lagos State</p>
-                            <p>+234 1 234 5678</p>
+                            <p>08067110127</p>
                         </div>
                         <div className="office">
                             <h4>Abuja Office</h4>
                             <p>Maitama, Abuja FCT</p>
-                            <p>+234 9 876 5432</p>
+                            <p>08067110127</p>
                         </div>
                         <div className="office">
                             <h4>Business Hours</h4>

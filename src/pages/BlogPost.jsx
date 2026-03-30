@@ -25,7 +25,11 @@ function BlogPost() {
                 </div>
 
                 <div className="blog-cover card-glass">
-                    <p>{post.coverLabel}</p>
+                    {post.thumbnail ? (
+                        <img src={post.thumbnail} alt={post.title} loading="lazy" />
+                    ) : (
+                        <p>{post.coverLabel}</p>
+                    )}
                 </div>
 
                 <article className="blog-content card-glass">
@@ -61,7 +65,11 @@ function BlogPost() {
                                     <span className="category-tag">{item.category}</span>
                                     <span className="read-time">{item.readTime}</span>
                                 </div>
-                                <h3>{item.title}</h3>
+                                <h3>
+                                    <Link to={`/blog/${item.slug}`} className="blog-title-link">
+                                        {item.title}
+                                    </Link>
+                                </h3>
                                 <p>{item.excerpt}</p>
                                 <div className="blog-footer">
                                     <span className="author">{item.author}</span>

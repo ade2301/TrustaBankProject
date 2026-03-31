@@ -1494,13 +1494,17 @@
   .home-hero-mobile {
     background-image:
       linear-gradient(150deg, rgba(2, 6, 23, 0.74), rgba(2, 6, 23, 0.56)),
-      url('../assets/hero-contact.jpg');
+      url('https://i.pinimg.com/736x/c0/b4/22/c0b4227b3692e66b91a7d9f7b0779ac1.jpg');
     background-size: cover;
     background-position: center;
-    border: 1px solid rgba(79, 70, 229, 0.24);
-    border-radius: 1rem;
-    padding: 1.3rem 1rem 1.2rem;
-    box-shadow: 0 20px 44px rgba(2, 6, 23, 0.36);
+    border: none;
+    border-radius: 0;
+    padding: 2rem 1.5rem;
+    box-shadow: none;
+    margin: 0;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    min-height: 60vh;
   }
 
   .home-hero-mobile .hero-dashboard {

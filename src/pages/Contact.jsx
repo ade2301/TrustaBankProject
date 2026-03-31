@@ -20,7 +20,7 @@ const contactMethods = [
     {
         title: 'Phone Support',
         description: 'Call us directly',
-        contact: '08067110127',
+        contact: '07067110127',
         response: 'Business hours: 8am-6pm WAT',
     },
     {
@@ -32,7 +32,7 @@ const contactMethods = [
     {
         title: 'WhatsApp Support',
         description: 'Quick support on chat',
-        contact: '08067110127',
+        contact: '07067110127',
         response: 'Typical response: under 5 mins',
     },
     {

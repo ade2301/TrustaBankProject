@@ -1,9 +1,12 @@
 .navbar-wrap {
   position: fixed;
-  inset: 0 0 auto;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 20;
   transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   background: rgba(11, 17, 32, 0.05);
+  pointer-events: none;
 }
 
 .navbar-wrap.navbar-scrolled {
@@ -22,6 +25,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  pointer-events: auto;
 }
 
 .brand,
@@ -590,11 +594,13 @@
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.2s ease;
     opacity: 0;
+    pointer-events: none;
   }
 
   .nav-links.mobile-open {
     max-height: min(68vh, 460px);
     opacity: 1;
+    pointer-events: auto;
   }
 
   .mobile-backdrop {

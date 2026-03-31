@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { Router } from 'express'
+import argon2 from 'argon2'
 import { requireAuth } from '../middleware/auth.js'
 import User from '../models/User.js'
 import { createUniqueAccountNumber } from '../utils/accountNumber.js'
@@ -28,6 +29,35 @@ function generateOtpCode() {
 
 function getRemainingSeconds(lockUntil) {
   return Math.max(0, Math.ceil((lockUntil.getTime() - Date.now()) / 1000))
+}
+
+function getRequestIp(req) {
+  return String((req.headers['x-forwarded-for'] || req.ip || 'unknown')).split(',')[0].trim()
+}
+
+function isKnownDevice(user, ip, deviceId) {
+  return user.deviceFingerprints.some((fingerprint) => fingerprint.ip === ip && fingerprint.deviceId === deviceId)
+}
+
+async function registerKnownDevice(user, req, deviceId) {
+  if (!deviceId) {
+    return
+  }
+
+  const ip = getRequestIp(req)
+
+  if (isKnownDevice(user, ip, deviceId) || user.deviceFingerprints.length >= 5) {
+    return
+  }
+
+  user.deviceFingerprints.push({
+    ip,
+    userAgent: String(req.headers['user-agent'] || ''),
+    deviceId,
+    addedAt: new Date(),
+  })
+
+  await user.save()
 }
 
 function getUnknownAttemptState(key) {
@@ -113,6 +143,7 @@ function sanitizeUser(user) {
     email: user.email,
     accountNumber: user.accountNumber,
     createdAt: user.createdAt,
+    isOnboarded: user.isOnboarded || false,
   }
 }
 
@@ -308,7 +339,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/verify-login-otp', async (req, res) => {
   try {
-    const { otpToken, otp } = req.body
+    const { otpToken, otp, deviceId } = req.body
 
     if (!otpToken || !otp) {
       return res.status(400).json({ message: 'OTP token and code are required' })
@@ -388,6 +419,11 @@ router.post('/verify-login-otp', async (req, res) => {
     user.loginOtpExpiresAt = null
     user.loginOtpAttempts = 0
     user.loginOtpLockUntil = null
+
+    if (deviceId) {
+      await registerKnownDevice(user, req, String(deviceId))
+    }
+
     await user.save()
 
     const authToken = signToken(user._id.toString())
@@ -410,6 +446,221 @@ router.post('/logout', (req, res) => {
 
 router.get('/me', requireAuth, (req, res) => {
   return res.json({ user: sanitizeUser(req.user) })
+})
+
+router.post('/pin-login-status', async (req, res) => {
+  try {
+    const { email, deviceId } = req.body
+
+    if (!email || !deviceId) {
+      return res.status(400).json({ message: 'Email and device ID are required' })
+    }
+
+    const normalizedEmail = String(email).toLowerCase().trim()
+    const user = await User.findOne({ email: normalizedEmail })
+
+    if (!user || !user.isOnboarded || !user.pinHash) {
+      return res.json({ canUsePin: false })
+    }
+
+    const ip = getRequestIp(req)
+    const canUsePin = isKnownDevice(user, ip, String(deviceId))
+
+    if (!canUsePin) {
+      return res.json({ canUsePin: false })
+    }
+
+    return res.json({
+      canUsePin: true,
+      name: user.fullName.split(' ')[0],
+      maskedAccount: `${user.accountNumber.substring(0, 2)}${'*'.repeat(8)}`,
+    })
+  } catch {
+    return res.status(500).json({ message: 'Unable to check PIN login status' })
+  }
+})
+
+// Device Recognition
+router.post('/recognize-device', requireAuth, async (req, res) => {
+  try {
+    const userAgent = String(req.headers['user-agent'] || '')
+    const ip = getRequestIp(req)
+    const deviceId = req.body.deviceId || 'unknown'
+
+    const user = req.user
+    const isRecognized = user.deviceFingerprints.some(
+      (fp) => fp.ip === ip && fp.deviceId === deviceId,
+    )
+
+    if (!isRecognized && user.deviceFingerprints.length < 5) {
+      user.deviceFingerprints.push({
+        ip,
+        userAgent,
+        deviceId,
+        addedAt: new Date(),
+      })
+      await user.save()
+    }
+
+    return res.json({
+      isRecognized,
+      maskedAccount: `${user.accountNumber.substring(0, 2)}${'*'.repeat(8)}`,
+      name: user.fullName.split(' ')[0],
+    })
+  } catch (error) {
+    return res.status(500).json({ message: 'Device recognition failed' })
+  }
+})
+
+// PIN Login
+router.post('/verify-pin', async (req, res) => {
+  try {
+    const { email, pin, deviceId } = req.body
+
+    if (!email || !pin || !deviceId) {
+      return res.status(400).json({ message: 'Email, device ID, and PIN are required' })
+    }
+
+    const normalizedEmail = String(email).toLowerCase().trim()
+    const user = await User.findOne({ email: normalizedEmail })
+
+    if (!user || !user.isOnboarded || !user.pinHash) {
+      return res.status(401).json({ message: 'Invalid credentials' })
+    }
+
+    const ip = getRequestIp(req)
+    const recognizedDevice = isKnownDevice(user, ip, String(deviceId))
+
+    if (!recognizedDevice) {
+      return res.status(403).json({
+        message: 'This device is not recognized. Use email and OTP login.',
+      })
+    }
+
+    // Check PIN lockout
+    if (user.pinLockedUntil && user.pinLockedUntil.getTime() > Date.now()) {
+      return res.status(429).json({
+        message: 'PIN entry is temporarily locked. Try again later.',
+        lockRemainingSeconds: getRemainingSeconds(user.pinLockedUntil),
+      })
+    }
+
+    if (user.pinLockedUntil && user.pinLockedUntil.getTime() <= Date.now()) {
+      user.failedPinAttempts = 0
+      user.pinLockedUntil = null
+    }
+
+    // Validate PIN with Argon2
+    const isValidPin = await argon2.verify(user.pinHash, String(pin))
+
+    if (!isValidPin) {
+      user.failedPinAttempts += 1
+      const remainingAttempts = Math.max(0, 3 - user.failedPinAttempts)
+
+      if (remainingAttempts === 0) {
+        user.pinLockedUntil = new Date(Date.now() + 15 * 60 * 1000) // 15 min lockout
+        user.failedPinAttempts = 0
+        await user.save()
+
+        return res.status(429).json({
+          message: 'Too many failed PIN attempts. Locked for 15 minutes.',
+          remainingAttempts: 0,
+          lockRemainingSeconds: getRemainingSeconds(user.pinLockedUntil),
+        })
+      }
+
+      await user.save()
+      return res.status(401).json({
+        message: 'Invalid PIN',
+        remainingAttempts,
+      })
+    }
+
+    // Reset attempts on success
+    user.failedPinAttempts = 0
+    user.pinLockedUntil = null
+    user.lastLoginIp = ip
+    user.lastLoginAt = new Date()
+    await user.save()
+
+    const authToken = signToken(user._id.toString())
+    res.cookie('trusta_token', authToken, authCookieOptions())
+
+    return res.json({ user: sanitizeUser(user) })
+  } catch (error) {
+    return res.status(500).json({ message: 'PIN verification failed' })
+  }
+})
+
+// Setup PINs during onboarding
+router.post('/setup-pins', requireAuth, async (req, res) => {
+  try {
+    const { pin, transactionPin } = req.body
+
+    if (!pin || !transactionPin) {
+      return res.status(400).json({ message: 'Both PIN and transaction PIN are required' })
+    }
+
+    // Validate PIN format (6 digits, numbers only)
+    if (!/^\d{6}$/.test(String(pin))) {
+      return res.status(400).json({ message: 'PIN must be exactly 6 digits' })
+    }
+
+    if (!/^\d{4}$/.test(String(transactionPin))) {
+      return res.status(400).json({ message: 'Transaction PIN must be exactly 4 digits' })
+    }
+
+    if (pin === transactionPin) {
+      return res.status(400).json({ message: 'PIN and transaction PIN must be different' })
+    }
+
+    const user = req.user
+    user.pinHash = await argon2.hash(String(pin))
+    user.transactionPinHash = await argon2.hash(String(transactionPin))
+    await user.save()
+
+    return res.json({ message: 'PINs set successfully' })
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to setup PINs' })
+  }
+})
+
+// Complete Onboarding
+router.post('/complete-onboarding', requireAuth, async (req, res) => {
+  try {
+    const { personalInfo, contactInfo } = req.body
+
+    if (!personalInfo || !contactInfo) {
+      return res.status(400).json({ message: 'Personal and contact info are required' })
+    }
+
+    const user = req.user
+    user.personalInfo = {
+      dateOfBirth: personalInfo.dateOfBirth,
+      gender: personalInfo.gender,
+      nationality: personalInfo.nationality,
+      countryOfResidence: personalInfo.countryOfResidence,
+    }
+    user.contactInfo = {
+      phoneNumber: contactInfo.phoneNumber,
+      physicalAddress: contactInfo.physicalAddress,
+      verified: false,
+    }
+    user.isOnboarded = true
+    await user.save()
+
+    return res.json({ message: 'Onboarding completed', user: sanitizeUser(user) })
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to complete onboarding' })
+  }
+})
+
+// Check onboarding status
+router.get('/onboarding-status', requireAuth, (req, res) => {
+  return res.json({
+    isOnboarded: req.user.isOnboarded,
+    hasPins: Boolean(req.user.pinHash && req.user.transactionPinHash),
+  })
 })
 
 export default router

@@ -175,6 +175,12 @@ function Register() {
         <p className="auth-footnote">
           Already have an account? <Link to="/login">Login</Link>
         </p>
+
+        <p className="auth-footnote auth-back-footnote">
+          <Link to="/" className="auth-back-link">
+            Back to landing page
+          </Link>
+        </p>
       </section>
     </div>
   )

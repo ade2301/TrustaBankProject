@@ -16,16 +16,81 @@ import Careers from './pages/Careers'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CookiePolicy from './pages/CookiePolicy'
 import { useAuth } from './context/AuthContext'
+import Onboarding from './pages/Onboarding'
+import Dashboard from './pages/Dashboard'
+import AppSplash from './components/AppSplash'
 
 function PublicOnlyRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, isSessionUnlocked, user } = useAuth()
+
+  if (isLoading) {
+    return null
+  }
+
+  if (isAuthenticated && isSessionUnlocked) {
+    return <Navigate to={user?.isOnboarded ? '/dashboard' : '/onboarding'} replace />
+  }
+
+  return children
+}
+
+function HomeRoute() {
+  const { isAuthenticated, isLoading, isSessionUnlocked, user } = useAuth()
 
   if (isLoading) {
     return null
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    if (!isSessionUnlocked) {
+      return <Navigate to="/login" replace />
+    }
+
+    return <Navigate to={user?.isOnboarded ? '/dashboard' : '/onboarding'} replace />
+  }
+
+  return <Home />
+}
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, isLoading, isSessionUnlocked, user } = useAuth()
+
+  if (isLoading) {
+    return null
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!isSessionUnlocked) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!user?.isOnboarded) {
+    return <Navigate to="/onboarding" replace />
+  }
+
+  return children
+}
+
+function OnboardingRoute({ children }) {
+  const { isAuthenticated, isLoading, isSessionUnlocked, user } = useAuth()
+
+  if (isLoading) {
+    return null
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!isSessionUnlocked) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (user?.isOnboarded) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return children
@@ -33,8 +98,11 @@ function PublicOnlyRoute({ children }) {
 
 function App() {
   const location = useLocation()
-  const { isLoading } = useAuth()
+  const { isLoading, isAuthenticated, isSessionUnlocked, user } = useAuth()
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/register'
+  const isDashboardRoute = location.pathname === '/dashboard'
+  const isOnboardingRoute = location.pathname === '/onboarding'
+  const [showDashboardSplash, setShowDashboardSplash] = useState(false)
   const [theme, setTheme] = useState(() => {
     const storedTheme = window.localStorage.getItem('trusta-theme')
     return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'light'
@@ -50,23 +118,53 @@ function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [location.pathname])
 
+  useEffect(() => {
+    if (isLoading) {
+      return undefined
+    }
+
+    const shouldShowDashboardSplash =
+      location.pathname === '/dashboard' &&
+      isAuthenticated &&
+      isSessionUnlocked &&
+      Boolean(user?.isOnboarded)
+
+    if (!shouldShowDashboardSplash) {
+      setShowDashboardSplash(false)
+      return undefined
+    }
+
+    setShowDashboardSplash(true)
+    const timer = window.setTimeout(() => {
+      setShowDashboardSplash(false)
+    }, 1300)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [location.pathname, isAuthenticated, isSessionUnlocked, user, isLoading])
+
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
   }
 
   if (isLoading) {
-    return null
+    return <AppSplash message="Loading your secure session..." />
+  }
+
+  if (showDashboardSplash) {
+    return <AppSplash message="Preparing your dashboard..." />
   }
 
   return (
     <div className="app-shell">
-      <ThemeToggle theme={theme} onToggle={toggleTheme} />
+      {!isDashboardRoute && <ThemeToggle theme={theme} onToggle={toggleTheme} />}
 
-      {!isAuthRoute && <Navbar />}
+      {!isAuthRoute && !isDashboardRoute && !isOnboardingRoute && <Navbar />}
 
       <main className={`page-shell ${isAuthRoute ? 'auth-layout' : ''}`}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeRoute />} />
           <Route path="/about" element={<About />} />
           <Route path="/solutions" element={<Solutions />} />
           <Route path="/pricing" element={<Navigate to="/solutions" replace />} />
@@ -93,11 +191,27 @@ function App() {
               </PublicOnlyRoute>
             }
           />
+            <Route
+              path="/onboarding"
+              element={
+                <OnboardingRoute>
+                  <Onboarding />
+                </OnboardingRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                    <Dashboard theme={theme} onToggleTheme={toggleTheme} />
+                </ProtectedRoute>
+              }
+            />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
 
-      {!isAuthRoute && <Footer />}
+      {!isAuthRoute && !isDashboardRoute && !isOnboardingRoute && <Footer />}
     </div>
   )
 }

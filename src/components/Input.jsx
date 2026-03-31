@@ -11,6 +11,8 @@ function Input({
   autoComplete,
   required = false,
   enablePasswordToggle = false,
+  disabled = false,
+  ...rest
 }) {
   const isPasswordField = type === 'password' && enablePasswordToggle
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -33,6 +35,8 @@ function Input({
             name={name}
             autoComplete={autoComplete}
             required={required}
+            disabled={disabled}
+            {...rest}
           />
           <button
             type="button"
@@ -75,6 +79,8 @@ function Input({
           name={name}
           autoComplete={autoComplete}
           required={required}
+          disabled={disabled}
+          {...rest}
         />
       )}
     </div>

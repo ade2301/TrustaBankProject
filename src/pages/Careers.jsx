@@ -222,6 +222,47 @@ const values = [
     },
 ]
 
+function AnimatedMetric({ end, duration = 1900, suffix = '' }) {
+    const [value, setValue] = useState(0)
+    const [hasAnimated, setHasAnimated] = useState(false)
+
+    useEffect(() => {
+        if (hasAnimated) {
+            return undefined
+        }
+
+        let frameId = null
+        const start = performance.now()
+
+        const tick = (timestamp) => {
+            const progress = Math.min((timestamp - start) / duration, 1)
+            const eased = 1 - Math.pow(1 - progress, 3)
+            setValue(end * eased)
+
+            if (progress < 1) {
+                frameId = window.requestAnimationFrame(tick)
+            } else {
+                setHasAnimated(true)
+            }
+        }
+
+        frameId = window.requestAnimationFrame(tick)
+
+        return () => {
+            if (frameId !== null) {
+                window.cancelAnimationFrame(frameId)
+            }
+        }
+    }, [duration, end, hasAnimated])
+
+    return (
+        <span className="metric-value">
+            {Math.round(value)}
+            {suffix}
+        </span>
+    )
+}
+
 function Careers() {
     const [selectedJob, setSelectedJob] = useState(null)
 
@@ -291,6 +332,27 @@ function Careers() {
                         </Card>
                     ))}
                 </div>
+            </RevealSection>
+
+            <RevealSection className="section about-metrics" delay={0.23}>
+                <Card className="metric-card card-glass">
+                    <h2>
+                        <AnimatedMetric end={jobs.length} suffix="+" />
+                    </h2>
+                    <p>Open roles currently available across teams.</p>
+                </Card>
+                <Card className="metric-card card-glass">
+                    <h2>
+                        <AnimatedMetric end={jobs.filter((job) => job.workMode === 'Remote').length} />
+                    </h2>
+                    <p>Remote positions you can apply for from anywhere.</p>
+                </Card>
+                <Card className="metric-card card-glass">
+                    <h2>
+                        <AnimatedMetric end={values.length} />
+                    </h2>
+                    <p>Core values that guide our culture and decisions.</p>
+                </Card>
             </RevealSection>
 
             <RevealSection className="section" delay={0.25}>

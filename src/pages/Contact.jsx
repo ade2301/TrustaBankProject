@@ -8,7 +8,7 @@ const contactMethods = [
     {
         title: 'Email Support',
         description: 'Prefer email?',
-        contact: 'support@trustabank.ng',
+        contact: 'trustbank304@gmail.com',
         response: 'Response in 2-4 hours',
     },
     {
@@ -38,7 +38,7 @@ const contactMethods = [
     {
         title: 'Branch Appointment',
         description: 'Need in-person support?',
-        contact: 'Book via support@trustabank.ng',
+        contact: 'Book via trustbank304@gmail.com',
         response: 'Slots available weekdays',
     },
 ]

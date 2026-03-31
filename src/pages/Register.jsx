@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import trustaLogo from '../assets/trusta-logo-final.png'
+import { useAuth } from '../context/AuthContext'
 
 const getPasswordChecks = (password) => {
   return {
@@ -14,8 +15,14 @@ const getPasswordChecks = (password) => {
 }
 
 function Register() {
+  const { register } = useAuth()
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const passwordChecks = useMemo(() => getPasswordChecks(password), [password])
   const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword
@@ -32,8 +39,47 @@ function Register() {
     passwordsMatch && 'Confirm password matches',
   ].filter(Boolean)
 
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    if (!canSubmit) {
+      return
+    }
+
+    setError('')
+    setSuccess('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await register({ fullName, email, password })
+      setSuccess(response.message || 'Registration successful. Please login to continue.')
+      setFullName('')
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to create account. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="auth-page page-load">
+      {success && (
+        <div className="auth-top-flash auth-top-flash-success" role="status" aria-live="polite">
+          <p>{success}</p>
+          <button
+            type="button"
+            className="auth-top-flash-close"
+            onClick={() => setSuccess('')}
+            aria-label="Dismiss success message"
+          >
+            x
+          </button>
+        </div>
+      )}
+
       <div className="auth-overlay" />
       <section className="auth-card card-glass">
         <div className="auth-brand-top">
@@ -42,7 +88,7 @@ function Register() {
           <h1>Join Trusta Bank</h1>
         </div>
 
-        <form className="auth-form">
+        <form className="auth-form" onSubmit={handleSubmit}>
           <Input
             id="fullName"
             label="Full Name"
@@ -50,6 +96,9 @@ function Register() {
             placeholder="Oloriire Daniel Chukwuka"
             name="fullName"
             autoComplete="name"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            disabled={isSubmitting}
             required
           />
 
@@ -60,6 +109,9 @@ function Register() {
             placeholder="you@example.com"
             name="email"
             autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={isSubmitting}
             required
           />
 
@@ -72,6 +124,7 @@ function Register() {
             autoComplete="new-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            disabled={isSubmitting}
             enablePasswordToggle
             required
           />
@@ -86,6 +139,7 @@ function Register() {
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
+              disabled={isSubmitting}
               enablePasswordToggle
               required
             />
@@ -111,9 +165,11 @@ function Register() {
             {passwordsMatch && <p className="auth-notice auth-notice-success">Confirm password matched.</p>}
           </div>
 
-          <Button type="submit" fullWidth disabled={!canSubmit}>
-            Create Account
+          <Button type="submit" fullWidth disabled={!canSubmit || isSubmitting}>
+            {isSubmitting ? 'Creating account...' : 'Create Account'}
           </Button>
+
+          {error && <p className="auth-notice auth-notice-danger">{error}</p>}
         </form>
 
         <p className="auth-footnote">

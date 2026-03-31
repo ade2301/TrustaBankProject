@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import Button from './Button'
 import trustaLogo from '../assets/trusta-logo-final.png'
+import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-  const location = useLocation()
+  const { isAuthenticated, logout } = useAuth()
   const navRef = useRef(null)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -18,8 +19,12 @@ function Navbar() {
     { to: '/careers', label: 'Careers' },
     { to: '/blog', label: 'Blog' },
     { to: '/contact', label: 'Contact' },
-    { to: '/login', label: 'Login', mobileOnly: true },
-    { to: '/register', label: 'Sign Up', mobileOnly: true },
+    ...(!isAuthenticated
+      ? [
+          { to: '/login', label: 'Login', mobileOnly: true },
+          { to: '/register', label: 'Sign Up', mobileOnly: true },
+        ]
+      : []),
   ]
 
   const closeMobileMenu = () => setMobileOpen(false)
@@ -29,6 +34,11 @@ function Navbar() {
     closeMobileMenu()
   }
 
+  const handleLogout = async () => {
+    closeMobileMenu()
+    await logout()
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
@@ -36,10 +46,6 @@ function Navbar() {
 
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  useEffect(() => {
-    closeMobileMenu()
-  }, [location.pathname])
 
   useEffect(() => {
     if (!clickedPath) {
@@ -110,15 +116,29 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
+
+          {isAuthenticated && (
+            <button type="button" className="nav-link mobile-auth" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
         </div>
 
         <div className="nav-actions">
-          <Button variant="ghost" to="/login">
-            Login
-          </Button>
-          <Button variant="gradient" to="/register">
-            Sign Up
-          </Button>
+          {!isAuthenticated ? (
+            <>
+              <Button variant="ghost" to="/login">
+                Login
+              </Button>
+              <Button variant="gradient" to="/register">
+                Sign Up
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
         </div>
 
         <button

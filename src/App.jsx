@@ -15,18 +15,30 @@ import Contact from './pages/Contact'
 import Careers from './pages/Careers'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CookiePolicy from './pages/CookiePolicy'
+import { useAuth } from './context/AuthContext'
+
+function PublicOnlyRoute({ children }) {
+  const { isAuthenticated, isLoading } = useAuth()
+
+  if (isLoading) {
+    return null
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />
+  }
+
+  return children
+}
 
 function App() {
   const location = useLocation()
+  const { isLoading } = useAuth()
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/register'
-  const [theme, setTheme] = useState('light')
-
-  useEffect(() => {
+  const [theme, setTheme] = useState(() => {
     const storedTheme = window.localStorage.getItem('trusta-theme')
-    if (storedTheme === 'light' || storedTheme === 'dark') {
-      setTheme(storedTheme)
-    }
-  }, [])
+    return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'light'
+  })
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -40,6 +52,10 @@ function App() {
 
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
+  }
+
+  if (isLoading) {
+    return null
   }
 
   return (
@@ -61,8 +77,22 @@ function App() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicOnlyRoute>
+                <Register />
+              </PublicOnlyRoute>
+            }
+          />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

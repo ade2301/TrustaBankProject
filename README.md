@@ -1,16 +1,16 @@
-# 💳 Trusta Bank
+#  Trusta Bank
 
 A modern, full-featured banking web application that brings the fintech experience to life. Think of it as a digital banking platform similar to Opay and Palmpay, but built from the ground up to showcase real-world banking features and security practices.
 
 ---
 
-## 🌐 Live Demo
+##  Live Demo
 
 Check out the live app here: https://trusta-bank.vercel.app
 
 ---
 
-## 📋 What is Trusta Bank?
+##  What is Trusta Bank?
 
 Trusta Bank is a complete banking simulation that lets you experience modern digital banking. Here's what you can do:
 
@@ -25,34 +25,34 @@ This project is all about building a secure, scalable banking system—the kind 
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
-### 🔐 Smart Authentication
+###  Smart Authentication
 We take security seriously. You get:
 - Easy registration with email and password
 - Secure login that remembers you (JWT tokens)
 - Sessions that stay active so you don't have to keep logging in
 
-### 📱 Your Own Account Number
+###  Your Own Account Number
 When you sign up, you instantly get a unique 10-digit account number—no duplicates, no confusion. It's yours and nobody else's.
 
-### 🛡️ Two-Layer Security
+###  Two-Layer Security
 Money transfers require extra protection:
 - Your password gets you in
 - Your 4-digit PIN secures every transaction
 Just like Opay and real banks do it.
 
-### 💸 Real Transactions
+###  Real Transactions
 - Transfer money between accounts
 - PIN verification on every transfer
 - Complete record of everything you send and receive
 
-### 📲 Mobile-First Design
+###  Mobile-First Design
 The whole app is built mobile-first. It feels like a real banking app on your phone, but it works perfectly on any device.
 
 ---
 
-## 🛠️ What We Built This With
+##  What We Built This With
 
 **Frontend:**
 - React (powered by Vite for blazing-fast development)
@@ -68,7 +68,7 @@ The whole app is built mobile-first. It feels like a real banking app on your ph
 
 ---
 
-## 📁 How It's Organized
+##  How It's Organized
 
 ```bash
 client/        # React frontend (Vite)
@@ -85,7 +85,7 @@ server/
 
 ---
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 ### 1. Clone the repository
 
@@ -148,7 +148,7 @@ That's it! Your app should now be running.
 
 ---
 
-## 🔐 How We Keep Your Money Safe
+##  How We Keep Your Money Safe
 
 Security isn't an afterthought here—it's built in from day one:
 
@@ -159,30 +159,30 @@ Security isn't an afterthought here—it's built in from day one:
 
 ---
 
-## 🚀 Cool Stuff Coming Soon
+##  Cool Stuff Coming Soon
 
 We're constantly improving Trusta Bank. Here's what's on the roadmap:
 
-- 💳 Virtual debit cards you can use instantly
-- 📊 Personal finance dashboard with insights
-- 🔔 Real-time notifications for your transactions
-- 🌐 Support for multiple languages
-- 📲 Progressive Web App so it works offline too
+-  Virtual debit cards you can use instantly
+-  Personal finance dashboard with insights
+-  Real-time notifications for your transactions
+-  Support for multiple languages
+-  Progressive Web App so it works offline too
 
 ---
 
-## 👨‍💻 Built By
+##  Built By
 
 **Adeniyi Ademola**
 
 ---
 
-## 🤝 Want to Help?
+## Want to Help?
 
 We'd love your contributions! This is an open project, so feel free to fork it, make improvements, and send pull requests our way.
 
 ---
 
-## 📄 License & Disclaimer
+##  License & Disclaimer
 
 This project is built for learning and demonstration purposes. It's a great way to understand how real fintech apps work, but it's not a real bank and shouldn't be used with real money.

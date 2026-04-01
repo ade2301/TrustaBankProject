@@ -18,9 +18,9 @@ function createTransporter(portOverride) {
         port,
         secure: port === 465,
         requireTLS: port !== 465,
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
+        connectionTimeout: 12000,
+        greetingTimeout: 12000,
+        socketTimeout: 12000,
         tls: {
             minVersion: 'TLSv1.2',
         },
@@ -39,10 +39,24 @@ function getTransporter() {
     return transporter
 }
 
+function getPortAttempts() {
+    const configured = Number(process.env.SMTP_PORT || 587)
+    const primary = Number.isFinite(configured) && configured > 0 ? configured : 587
+    const fallback = primary === 465 ? 587 : 465
+
+    // Try configured port first, then the alternate SMTP submission port.
+    return [primary, fallback]
+}
+
 export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
     const from = process.env.SMTP_FROM || process.env.SMTP_USER
-    const configuredPort = Number(process.env.SMTP_PORT || 587)
-    const mailer = getTransporter()
+    const mailOptions = {
+        from,
+        to,
+        subject: 'Your Trusta login OTP',
+        text: `Hi ${fullName},\n\nYour one-time login code is ${otpCode}. It expires in 10 minutes.\n\nIf this was not you, please reset your password immediately.`,
+        html: `<p>Hi ${fullName},</p><p>Your one-time login code is <strong>${otpCode}</strong>.</p><p>This code expires in 10 minutes.</p><p>If this was not you, please reset your password immediately.</p>`,
+    }
 
     console.log('📧 Sending OTP email:', {
         from,
@@ -52,39 +66,23 @@ export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
         smtpUser: process.env.SMTP_USER,
     })
 
-    try {
-        const info = await mailer.sendMail({
-            from,
-            to,
-            subject: 'Your Trusta login OTP',
-            text: `Hi ${fullName},\n\nYour one-time login code is ${otpCode}. It expires in 10 minutes.\n\nIf this was not you, please reset your password immediately.`,
-            html: `<p>Hi ${fullName},</p><p>Your one-time login code is <strong>${otpCode}</strong>.</p><p>This code expires in 10 minutes.</p><p>If this was not you, please reset your password immediately.</p>`,
-        })
-        console.log('✅ OTP email sent successfully:', info.response)
-        return info
-    } catch (error) {
-        const shouldRetryOnFallbackPort = configuredPort !== 587
+    const ports = getPortAttempts()
+    let lastError = null
 
-        if (shouldRetryOnFallbackPort) {
-            try {
-                const fallbackMailer = createTransporter(587)
-                const info = await fallbackMailer.sendMail({
-                    from,
-                    to,
-                    subject: 'Your Trusta login OTP',
-                    text: `Hi ${fullName},\n\nYour one-time login code is ${otpCode}. It expires in 10 minutes.\n\nIf this was not you, please reset your password immediately.`,
-                    html: `<p>Hi ${fullName},</p><p>Your one-time login code is <strong>${otpCode}</strong>.</p><p>This code expires in 10 minutes.</p><p>If this was not you, please reset your password immediately.</p>`,
-                })
+    for (const port of ports) {
+        try {
+            const mailer = port === Number(process.env.SMTP_PORT || 587) ? getTransporter() : createTransporter(port)
+            const info = await mailer.sendMail(mailOptions)
 
-                console.log('✅ OTP email sent successfully on fallback port 587:', info.response)
-                transporter = fallbackMailer
-                return info
-            } catch (fallbackError) {
-                console.error('❌ Failed to send OTP email on fallback port 587:', fallbackError.message)
-            }
+            // Cache the successful transporter for future OTP sends.
+            transporter = mailer
+            console.log(`✅ OTP email sent successfully on port ${port}:`, info.response)
+            return info
+        } catch (error) {
+            lastError = error
+            console.error(`❌ Failed to send OTP email on port ${port}:`, error.message)
         }
-
-        console.error('❌ Failed to send OTP email:', error.message)
-        throw error
     }
+
+    throw lastError || new Error('Unable to send OTP email. Check SMTP settings.')
 }

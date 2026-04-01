@@ -299,9 +299,9 @@
 }
 
 .copy-account-btn.copied {
-    border-color: color-mix(in srgb, #22c55e 60%, var(--border));
-    background: color-mix(in srgb, #22c55e 20%, var(--surface));
-    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.28), 0 8px 18px rgba(34, 197, 94, 0.18);
+    border-color: color-mix(in srgb, var(--primary) 60%, var(--border));
+    background: color-mix(in srgb, var(--primary) 20%, var(--surface));
+    box-shadow: 0 0 0 1px rgba(91, 52, 235, 0.28), 0 8px 18px rgba(91, 52, 235, 0.18);
 }
 
 .copy-account-btn:hover {
@@ -320,7 +320,7 @@
 }
 
 .copy-account-btn.copied .copy-account-icon {
-    filter: invert(60%) sepia(57%) saturate(538%) hue-rotate(86deg) brightness(96%) contrast(90%);
+    filter: invert(28%) sepia(61%) saturate(1873%) hue-rotate(243deg) brightness(94%) contrast(92%);
     animation: copyIconPop 0.25s ease;
 }
 
@@ -329,7 +329,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(91, 52, 235, 0.35);
     animation: copyRing 0.45s ease;
 }
 
@@ -566,7 +566,7 @@
 .cards-help-btn {
     border: 0;
     background: transparent;
-    color: #34d399;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -589,18 +589,18 @@
     background:
         radial-gradient(circle at 83% 22%, rgba(255, 255, 255, 0.28), transparent 34%),
         radial-gradient(circle at 70% 72%, rgba(255, 255, 255, 0.18), transparent 42%),
-        linear-gradient(130deg, #10b981 0%, #34d399 42%, #2dd4bf 100%);
-    color: #eefdf8;
+        linear-gradient(130deg, #5b34eb 0%, #8b5cf6 45%, #a78bfa 100%);
+    color: #f5f3ff;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 14px 30px rgba(7, 37, 32, 0.35);
+    box-shadow: 0 14px 30px rgba(43, 18, 99, 0.35);
 }
 
 .cards-showcase-card.physical {
     background:
         radial-gradient(circle at 22% 35%, rgba(20, 52, 105, 0.15), transparent 28%),
-        radial-gradient(circle at 80% 20%, rgba(44, 184, 146, 0.18), transparent 34%),
-        linear-gradient(155deg, #f8fafc 0%, #ecfeff 100%);
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.18), transparent 34%),
+        linear-gradient(155deg, #f8f7ff 0%, #f1edff 100%);
     color: #0f172a;
     border: 1px solid rgba(148, 163, 184, 0.35);
 }
@@ -612,8 +612,8 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: 700;
-    color: #065f46;
-    background: #d1fae5;
+    color: #4c1d95;
+    background: #ede9fe;
 }
 
 .cards-showcase-brand {
@@ -670,7 +670,6 @@
 }
 
 .action-btn .icon {
-    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -679,6 +678,12 @@
     background: rgba(79, 70, 229, 0.1);
     border-radius: 8px;
     color: var(--primary);
+}
+
+.action-btn .icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
 }
 
 /* Recent Transactions */
@@ -710,6 +715,13 @@
     text-decoration: none;
     font-weight: 600;
     transition: color 0.2s ease;
+}
+
+.see-all-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
 }
 
 .see-all:hover {
@@ -779,9 +791,235 @@
     color: var(--text);
 }
 
+.transaction-narration {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 500;
+}
+
 .transaction-date {
     font-size: 12px;
     color: var(--subtext);
+}
+
+.transaction-empty-state {
+    text-align: center;
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    color: var(--subtext);
+    font-size: 13px;
+}
+
+.analysis-tab-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.analysis-filters-row {
+    display: grid;
+    gap: 8px;
+}
+
+.analysis-filters-row select {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.analysis-month-group {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    padding: 12px;
+}
+
+.analysis-month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.analysis-month-header h3 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.analysis-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--primary);
+    border-radius: 999px;
+    padding: 6px 10px;
+}
+
+.analysis-month-totals {
+    display: flex;
+    gap: 14px;
+    color: var(--subtext);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.analysis-month-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.analysis-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.analysis-history-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis-direction-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(91, 52, 235, 0.12);
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.analysis-history-main h4 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text);
+}
+
+.analysis-history-main p {
+    margin: 3px 0 0;
+    color: var(--subtext);
+    font-size: 12px;
+}
+
+.analysis-history-end {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.analysis-history-end strong {
+    font-size: 16px;
+}
+
+.analysis-history-end small {
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.profile-tab-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    padding: 12px;
+}
+
+.profile-card h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.profile-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-item span {
+    color: var(--subtext);
+    font-size: 11px;
+}
+
+.profile-item strong {
+    color: var(--text);
+    font-size: 13px;
+    word-break: break-word;
+}
+
+.profile-account-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.profile-account-value {
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+}
+
+.profile-complete-btn {
+    border: 1px solid color-mix(in srgb, var(--primary) 58%, var(--border));
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile-complete-form {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-complete-form input {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    color: var(--text);
+}
+
+.profile-form-error {
+    margin: 0;
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .transaction-amount {
@@ -792,7 +1030,7 @@
 }
 
 .transaction-amount.positive {
-    color: #22c55e;
+    color: var(--primary);
 }
 
 .transaction-amount.negative {
@@ -834,10 +1072,15 @@
 }
 
 .nav-item .icon {
-    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.nav-item .icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
 }
 
 .nav-item.active {
@@ -870,6 +1113,13 @@
         0 10px 24px rgba(91, 52, 235, 0.45),
         0 0 26px rgba(139, 92, 246, 0.55);
     position: relative;
+}
+
+.nav-toggle-item .nav-toggle-icon svg {
+    width: 22px;
+    height: 22px;
+    position: relative;
+    z-index: 1;
 }
 
 .nav-toggle-item .nav-toggle-icon::before {
@@ -923,6 +1173,10 @@
         padding: 16px 14px 104px;
     }
 
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
     .user-greeting h1 {
         font-size: 22px;
     }
@@ -943,7 +1197,11 @@
     .action-btn .icon {
         width: 28px;
         height: 28px;
-        font-size: 20px;
+    }
+
+    .action-btn .icon svg {
+        width: 16px;
+        height: 16px;
     }
 }
 
@@ -951,6 +1209,6 @@
     margin: 0 0 8px;
     text-align: center;
     font-size: 12px;
-    color: #34d399;
+    color: var(--primary);
     font-weight: 700;
 }

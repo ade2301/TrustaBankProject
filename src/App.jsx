@@ -18,6 +18,7 @@ import CookiePolicy from './pages/CookiePolicy'
 import { useAuth } from './context/AuthContext'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
+import Analysis from './pages/Analysis'
 import AppSplash from './components/AppSplash'
 
 function PublicOnlyRoute({ children }) {
@@ -204,6 +205,14 @@ function App() {
               element={
                 <ProtectedRoute>
                     <Dashboard theme={theme} onToggleTheme={toggleTheme} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analysis"
+              element={
+                <ProtectedRoute>
+                  <Analysis />
                 </ProtectedRoute>
               }
             />

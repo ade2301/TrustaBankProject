@@ -122,9 +122,16 @@ In your `/server` folder, create a `.env` file and add:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+PAYSTACK_SECRET_KEY=your_paystack_secret_key
 ```
 
-Just replace those values with your actual MongoDB connection string and generate a strong secret key.
+Optional (frontend, only if not using Vite proxy):
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
+
+Just replace those values with your actual MongoDB connection string, Paystack secret key, and generate a strong JWT secret key.
 
 ---
 

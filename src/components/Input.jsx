@@ -1,5 +1,27 @@
 import { useState } from 'react'
 
+function sanitizeValueByFilter(rawValue, filter) {
+  const value = String(rawValue ?? '')
+
+  switch (filter) {
+    case 'numeric':
+      return value.replace(/\D/g, '')
+    case 'decimal': {
+      const sanitized = value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
+      const [whole, fraction = ''] = sanitized.split('.')
+      return fraction.length > 0 ? `${whole}.${fraction.slice(0, 2)}` : whole
+    }
+    case 'text':
+      return value.replace(/[^A-Za-z\s'-]/g, '')
+    case 'alphanumeric':
+      return value.replace(/[^A-Za-z0-9\s]/g, '')
+    case 'account':
+      return value.replace(/[^A-Za-z0-9@._-]/g, '')
+    default:
+      return value
+  }
+}
+
 function Input({
   id,
   label,
@@ -9,6 +31,7 @@ function Input({
   onChange,
   name,
   autoComplete,
+  filter,
   required = false,
   enablePasswordToggle = false,
   disabled = false,
@@ -17,6 +40,28 @@ function Input({
   const isPasswordField = type === 'password' && enablePasswordToggle
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const resolvedType = isPasswordField && isPasswordVisible ? 'text' : type
+
+  const handleValueChange = (event) => {
+    const sanitizedValue = filter ? sanitizeValueByFilter(event.target.value, filter) : event.target.value
+
+    if (sanitizedValue !== event.target.value) {
+      event.target.value = sanitizedValue
+    }
+
+    if (onChange) {
+      onChange({
+        ...event,
+        target: {
+          ...event.target,
+          value: sanitizedValue,
+        },
+        currentTarget: {
+          ...event.currentTarget,
+          value: sanitizedValue,
+        },
+      })
+    }
+  }
 
   return (
     <div className="form-group">
@@ -31,7 +76,7 @@ function Input({
             type={resolvedType}
             placeholder={placeholder}
             value={value}
-            onChange={onChange}
+            onChange={handleValueChange}
             name={name}
             autoComplete={autoComplete}
             required={required}
@@ -75,7 +120,7 @@ function Input({
           type={resolvedType}
           placeholder={placeholder}
           value={value}
-          onChange={onChange}
+          onChange={handleValueChange}
           name={name}
           autoComplete={autoComplete}
           required={required}

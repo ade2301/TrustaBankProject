@@ -422,6 +422,7 @@ function Login() {
               id="otp"
               label="OTP Code"
               type="text"
+              filter="numeric"
               placeholder="Enter 6-digit code"
               name="otp"
               autoComplete="one-time-code"

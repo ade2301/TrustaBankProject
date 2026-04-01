@@ -93,6 +93,7 @@ function Register() {
             id="fullName"
             label="Full Name"
             type="text"
+            filter="text"
             placeholder="Oloriire Daniel Chukwuka"
             name="fullName"
             autoComplete="name"

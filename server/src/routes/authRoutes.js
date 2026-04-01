@@ -150,9 +150,16 @@ function recordIpAttempt(key) {
 }
 
 function sanitizeUser(user) {
+  const normalizedFullName = String(user.fullName || '').trim()
+  const nameParts = normalizedFullName.split(/\s+/).filter(Boolean)
+  const firstName = nameParts[0] || ''
+  const lastName = nameParts.slice(1).join(' ')
+
   return {
     id: user._id,
     fullName: user.fullName,
+    firstName,
+    lastName,
     email: user.email,
     accountNumber: user.accountNumber,
     createdAt: user.createdAt,
@@ -164,6 +171,17 @@ function sanitizeUser(user) {
     totalExpenses: Number(user.totalExpenses || 0),
     loginBonusGranted: Boolean(user.loginBonusGranted),
     hasLoginPin: Boolean(user.pinHash),
+    personalInfo: {
+      dateOfBirth: user.personalInfo?.dateOfBirth || '',
+      gender: user.personalInfo?.gender || '',
+      nationality: user.personalInfo?.nationality || '',
+      countryOfResidence: user.personalInfo?.countryOfResidence || '',
+    },
+    contactInfo: {
+      phoneNumber: user.contactInfo?.phoneNumber || '',
+      physicalAddress: user.contactInfo?.physicalAddress || '',
+      verified: Boolean(user.contactInfo?.verified),
+    },
   }
 }
 
@@ -714,6 +732,29 @@ router.get('/onboarding-status', requireAuth, (req, res) => {
     isOnboarded: req.user.isOnboarded,
     hasPins: Boolean(req.user.pinHash && req.user.transactionPinHash),
   })
+})
+
+router.post('/complete-registration', requireAuth, async (req, res) => {
+  try {
+    const firstName = String(req.body?.firstName || '').trim()
+    const lastName = String(req.body?.lastName || '').trim()
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({ message: 'First name and last name are required' })
+    }
+
+    if (!/^[A-Za-z'-\s]{2,60}$/.test(firstName) || !/^[A-Za-z'-\s]{2,60}$/.test(lastName)) {
+      return res.status(400).json({ message: 'Names can only contain letters, spaces, apostrophes, or hyphens' })
+    }
+
+    const user = req.user
+    user.fullName = `${firstName} ${lastName}`.replace(/\s+/g, ' ').trim()
+    await user.save()
+
+    return res.json({ message: 'Registration details updated', user: sanitizeUser(user) })
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to complete registration' })
+  }
 })
 
 export default router

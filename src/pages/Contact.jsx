@@ -78,7 +78,7 @@ function Contact() {
                         <h2>Send us a message</h2>
                         <form className="contact-form">
                             <div className="form-row">
-                                <Input id="name" label="Full Name" type="text" placeholder="Your name" required />
+                                <Input id="name" label="Full Name" type="text" filter="text" placeholder="Your name" required />
                                 <Input
                                     id="email"
                                     label="Email Address"
@@ -89,8 +89,8 @@ function Contact() {
                             </div>
 
                             <div className="form-row">
-                                <Input id="subject" label="Subject" type="text" placeholder="How can we help?" required />
-                                <Input id="phone" label="Phone (Optional)" type="tel" placeholder="+234 ..." />
+                                <Input id="subject" label="Subject" type="text" filter="text" placeholder="How can we help?" required />
+                                <Input id="phone" label="Phone (Optional)" type="text" filter="numeric" inputMode="numeric" pattern="[0-9]*" placeholder="080..." />
                             </div>
 
                             <div className="form-group">
@@ -102,6 +102,9 @@ function Contact() {
                                     className="form-textarea"
                                     placeholder="Tell us more..."
                                     rows="6"
+                                    onInput={(event) => {
+                                        event.currentTarget.value = event.currentTarget.value.replace(/[^A-Za-z\s'-]/g, '')
+                                    }}
                                     required
                                 />
                             </div>

@@ -1,0 +1,154 @@
+.analysis-page {
+  padding: 1.25rem 0 2.5rem;
+}
+
+.analysis-container {
+  width: min(980px, calc(100% - 1rem));
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.analysis-header h1 {
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.analysis-subtext {
+  color: var(--subtext);
+  margin-top: 6px;
+}
+
+.analysis-back-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.analysis-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.analysis-filters label {
+  font-size: 12px;
+  color: var(--subtext);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.analysis-filters select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.analysis-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-card span {
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+.metric-card strong {
+  font-size: 1rem;
+}
+
+.metric-card .positive {
+  color: #22c55e;
+}
+
+.metric-card .negative {
+  color: #ef4444;
+}
+
+.analysis-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.analysis-history-item {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.analysis-history-main h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.analysis-history-main p {
+  margin: 3px 0;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.analysis-history-main small {
+  color: var(--subtext);
+}
+
+.analysis-history-amount {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.analysis-history-amount.positive {
+  color: #22c55e;
+}
+
+.analysis-history-amount.negative {
+  color: #ef4444;
+}
+
+.analysis-empty {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: var(--subtext);
+}
+
+@media (max-width: 640px) {
+  .analysis-header {
+    flex-direction: column;
+  }
+
+  .analysis-metrics,
+  .analysis-filters {
+    grid-template-columns: 1fr;
+  }
+}

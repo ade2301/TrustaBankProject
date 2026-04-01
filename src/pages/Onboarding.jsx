@@ -37,6 +37,10 @@ function Onboarding() {
     transactionPin: '',
   })
 
+  const sanitizeTextOnly = (value) => String(value).replace(/[^A-Za-z\s'-]/g, '')
+  const sanitizePhone = (value) => String(value).replace(/\D/g, '').slice(0, 15)
+  const sanitizeAddress = (value) => String(value).replace(/[^A-Za-z0-9\s]/g, '')
+
   useEffect(() => {
     if (user?.isOnboarded) {
       navigate('/dashboard')
@@ -223,7 +227,7 @@ function Onboarding() {
                   id="nationality"
                   type="text"
                   value={personalInfo.nationality}
-                  onChange={(e) => handlePersonalInfoChange('nationality', e.target.value)}
+                  onChange={(e) => handlePersonalInfoChange('nationality', sanitizeTextOnly(e.target.value))}
                   className="form-input"
                   placeholder="e.g., Nigerian"
                 />
@@ -235,7 +239,7 @@ function Onboarding() {
                   id="country"
                   type="text"
                   value={personalInfo.countryOfResidence}
-                  onChange={(e) => handlePersonalInfoChange('countryOfResidence', e.target.value)}
+                  onChange={(e) => handlePersonalInfoChange('countryOfResidence', sanitizeTextOnly(e.target.value))}
                   className="form-input"
                   placeholder="e.g., Nigeria"
                 />
@@ -263,10 +267,12 @@ function Onboarding() {
                 <label htmlFor="phone">Phone Number *</label>
                 <input
                   id="phone"
-                  type="tel"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="+234..."
                   value={contactInfo.phoneNumber}
-                  onChange={(e) => handleContactInfoChange('phoneNumber', e.target.value)}
+                  onChange={(e) => handleContactInfoChange('phoneNumber', sanitizePhone(e.target.value))}
                   className="form-input"
                 />
               </div>
@@ -277,7 +283,7 @@ function Onboarding() {
                   id="address"
                   placeholder="Street address, city, state"
                   value={contactInfo.physicalAddress}
-                  onChange={(e) => handleContactInfoChange('physicalAddress', e.target.value)}
+                  onChange={(e) => handleContactInfoChange('physicalAddress', sanitizeAddress(e.target.value))}
                   className="form-input form-textarea"
                   rows="4"
                 ></textarea>

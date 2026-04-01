@@ -107,3 +107,10 @@ export function verifyTransactionPin(pin) {
     body: JSON.stringify({ pin }),
   })
 }
+
+export function completeRegistration(firstName, lastName) {
+  return request('/complete-registration', {
+    method: 'POST',
+    body: JSON.stringify({ firstName, lastName }),
+  })
+}

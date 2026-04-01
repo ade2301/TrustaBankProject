@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 import mongoose from 'mongoose'
 import authRoutes from './routes/authRoutes.js'
+import transferRoutes from './routes/transferRoutes.js'
 
 dotenv.config()
 
@@ -36,6 +37,7 @@ app.use(
 app.use(express.json({ limit: '10kb' }))
 app.use(cookieParser())
 app.use('/api/auth', authLimiter, authRoutes)
+app.use('/api/transfers', transferRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })

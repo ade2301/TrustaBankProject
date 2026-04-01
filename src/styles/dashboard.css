@@ -934,6 +934,17 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: calc(98vh - 220px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+    padding-bottom: 16px;
+    scrollbar-width: none;
+}
+
+.profile-tab-wrap::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .profile-card {
@@ -1175,6 +1186,10 @@
 
     .profile-grid {
         grid-template-columns: 1fr;
+    }
+
+    .profile-tab-wrap {
+        max-height: calc(100vh - 300px);
     }
 
     .user-greeting h1 {

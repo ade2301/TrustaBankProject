@@ -113,6 +113,11 @@ p {
   z-index: 2;
 }
 
+.page-shell.dashboard-layout {
+  width: 100%;
+  padding-top: 0;
+}
+
 .page {
   padding: 2rem 0 4rem;
 }

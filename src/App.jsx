@@ -163,7 +163,7 @@ function App() {
 
       {!isAuthRoute && !isDashboardRoute && !isOnboardingRoute && <Navbar />}
 
-      <main className={`page-shell ${isAuthRoute ? 'auth-layout' : ''}`}>
+      <main className={`page-shell ${isAuthRoute ? 'auth-layout' : ''} ${isDashboardRoute ? 'dashboard-layout' : ''}`}>
         <Routes>
           <Route path="/" element={<HomeRoute />} />
           <Route path="/about" element={<About />} />

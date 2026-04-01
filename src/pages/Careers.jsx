@@ -222,7 +222,22 @@ const values = [
     },
 ]
 
-function AnimatedMetric({ end, duration = 1900, suffix = '' }) {
+const pickValueIcon = (title) => {
+    if (/ownership|integrity/i.test(title)) return 'shield'
+    if (/excellence|innovation/i.test(title)) return 'spark'
+    if (/diversity|empathy/i.test(title)) return 'users'
+    return 'flow'
+}
+
+const pickJobIcon = (title) => {
+    if (/backend|devops/i.test(title)) return 'api'
+    if (/designer|community/i.test(title)) return 'chat'
+    if (/finance/i.test(title)) return 'chart'
+    if (/compliance|risk/i.test(title)) return 'shield'
+    return 'briefcase'
+}
+
+function AnimatedMetric({ end, duration = 3600, suffix = '' }) {
     const [value, setValue] = useState(0)
     const [hasAnimated, setHasAnimated] = useState(false)
 
@@ -236,7 +251,7 @@ function AnimatedMetric({ end, duration = 1900, suffix = '' }) {
 
         const tick = (timestamp) => {
             const progress = Math.min((timestamp - start) / duration, 1)
-            const eased = 1 - Math.pow(1 - progress, 3)
+            const eased = progress
             setValue(end * eased)
 
             if (progress < 1) {
@@ -301,7 +316,7 @@ function Careers() {
                 <div className="values-grid">
                     {values.map((value) => (
                         <Card key={value.title} className="value-card card-glass">
-                            <CardLogo />
+                            <CardLogo variant={pickValueIcon(value.title)} />
                             <h3>{value.title}</h3>
                             <p>{value.description}</p>
                         </Card>
@@ -314,7 +329,7 @@ function Careers() {
                 <div className="jobs-list">
                     {jobs.map((job) => (
                         <Card key={job.id} className="job-card card-glass job-hover">
-                            <CardLogo />
+                            <CardLogo variant={pickJobIcon(job.title)} />
                             <div className="job-header">
                                 <div>
                                     <h3>{job.title}</h3>

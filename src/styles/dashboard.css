@@ -167,8 +167,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
     flex-shrink: 0;
+    color: var(--primary);
+}
+
+.cards-benefit-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
 }
 
 .cards-benefit-copy h4 {

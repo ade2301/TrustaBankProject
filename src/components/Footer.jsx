@@ -2,6 +2,39 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import trustaLogo from '../assets/trusta-logo-final.png'
 
+function FooterCertificationIcon({ variant }) {
+  if (variant === 'ndic') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 20 6.5V12c0 5-3.4 7.9-8 9-4.6-1.1-8-4-8-9V6.5L12 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="m9.3 12 1.8 1.8 3.6-3.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+
+  if (variant === 'ssl') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7.5 10.2V7.8a4.5 4.5 0 0 1 9 0v2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="5" y="10.2" width="14" height="9.2" rx="2.2" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 13.3v2.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (variant === 'cbn') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 5.5 6.2v4.7c0 4.2 2.8 7.4 6.5 9 3.7-1.6 6.5-4.8 6.5-9V6.2L12 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M8.4 12.4h7.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M12 8.4v7.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  return null
+}
+
 function Footer() {
   const [email, setEmail] = useState('')
 
@@ -132,9 +165,18 @@ function Footer() {
       <div className="footer-bottom">
         <p>&copy; 2026 Trusta Bank. All rights reserved.</p>
         <div className="footer-certifications">
-          <span>🔒 NDIC Safeguarded</span>
-          <span>🛡️ SSL Certified</span>
-          <span>✅ CBN Compliant</span>
+          <span className="footer-cert-item">
+            <FooterCertificationIcon variant="ndic" />
+            <span>NDIC Safeguarded</span>
+          </span>
+          <span className="footer-cert-item">
+            <FooterCertificationIcon variant="ssl" />
+            <span>SSL Certified</span>
+          </span>
+          <span className="footer-cert-item">
+            <FooterCertificationIcon variant="cbn" />
+            <span>CBN Compliant</span>
+          </span>
         </div>
       </div>
     </footer>

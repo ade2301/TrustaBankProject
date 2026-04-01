@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Card from '../components/Card'
 import RevealSection from '../components/RevealSection'
 import CardLogo from '../components/CardLogo'
@@ -20,47 +20,20 @@ const values = [
 
 function AnimatedMetric({
   end,
-  duration = 1900,
+  duration = 3600,
   decimals = 0,
   suffix = '',
   prefix = '',
 }) {
   const [value, setValue] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const elementRef = useRef(null)
 
   useEffect(() => {
-    const element = elementRef.current
-    if (!element) {
-      return undefined
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.35 },
-    )
-
-    observer.observe(element)
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!isVisible) {
-      return undefined
-    }
-
     let frameId = null
     const start = performance.now()
 
     const tick = (timestamp) => {
       const progress = Math.min((timestamp - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
+      const eased = progress
       setValue(end * eased)
 
       if (progress < 1) {
@@ -75,12 +48,12 @@ function AnimatedMetric({
         window.cancelAnimationFrame(frameId)
       }
     }
-  }, [duration, end, isVisible])
+  }, [duration, end])
 
   const displayValue = decimals > 0 ? value.toFixed(decimals) : String(Math.round(value))
 
   return (
-    <span ref={elementRef} className="metric-value">
+    <span className="metric-value">
       {prefix}
       {displayValue}
       {suffix}
@@ -101,9 +74,9 @@ function About() {
 
       <RevealSection className="section" delay={0.15}>
         <div className="feature-grid">
-          {values.map((value) => (
+          {values.map((value, index) => (
             <Card key={value.title} className="feature-card card-glass">
-              <CardLogo />
+              <CardLogo variant={index === 0 ? 'flow' : index === 1 ? 'shield' : 'spark'} />
               <h3>{value.title}</h3>
               <p>{value.text}</p>
             </Card>

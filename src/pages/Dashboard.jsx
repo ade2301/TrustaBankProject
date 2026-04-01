@@ -9,6 +9,54 @@ import '../styles/dashboard.css'
 
 const API_ROOT = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 
+function BenefitIcon({ variant }) {
+    if (variant === 'speed') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+        )
+    }
+
+    if (variant === 'global') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                <path d="M3 12h18M12 3c2.8 3 4.2 6.4 4.2 9S14.8 18 12 21c-2.8-3-4.2-6.4-4.2-9S9.2 6 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+        )
+    }
+
+    if (variant === 'tools') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m14.7 6.3 3 3m-1.6-5.3a3.5 3.5 0 0 0-4.95 4.95L4 16.1V20h3.9l7.1-7.1a3.5 3.5 0 0 0 4.95-4.95l-1.25 1.25-2.98-2.98 1.98-1.97Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+        )
+    }
+
+    if (variant === 'fee') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 18.5 18.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="8" cy="8" r="1.8" stroke="currentColor" strokeWidth="2" />
+                <circle cx="16" cy="16" r="1.8" stroke="currentColor" strokeWidth="2" />
+            </svg>
+        )
+    }
+
+    if (variant === 'shield') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3 20 6.5V12c0 5-3.4 7.9-8 9-4.6-1.1-8-4-8-9V6.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                <path d="m9.2 12 2 2.1 3.9-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+        )
+    }
+
+    return null
+}
+
 function Dashboard({ theme = 'light', onToggleTheme }) {
     const { user, logout, refreshSession } = useAuth()
     const isDark = theme === 'dark'
@@ -20,6 +68,7 @@ function Dashboard({ theme = 'light', onToggleTheme }) {
     const [showCopyToast, setShowCopyToast] = useState(false)
     const [showCardUnavailableModal, setShowCardUnavailableModal] = useState(false)
     const [showWithdrawUnavailableModal, setShowWithdrawUnavailableModal] = useState(false)
+    const [showBillsUnavailableModal, setShowBillsUnavailableModal] = useState(false)
     const [showTransferModal, setShowTransferModal] = useState(false)
     const [selectedTransferType, setSelectedTransferType] = useState(null)
     const [transactions, setTransactions] = useState([])
@@ -261,27 +310,27 @@ function Dashboard({ theme = 'light', onToggleTheme }) {
             showcaseClassName: 'cards-showcase-card virtual',
             benefits: [
                 {
-                    icon: '⚡',
+                    icon: <BenefitIcon variant="speed" />,
                     title: 'Instant Access',
                     description: 'Use it instantly after quick application',
                 },
                 {
-                    icon: '🌐',
+                    icon: <BenefitIcon variant="global" />,
                     title: 'Accepted Across Online Merchants',
                     description: 'Including Google Play, Netflix, Shein, Uber and more.',
                 },
                 {
-                    icon: '🛠',
+                    icon: <BenefitIcon variant="tools" />,
                     title: 'Self-managed Transactions',
                     description: 'Set card controls and monitor payments in real time.',
                 },
                 {
-                    icon: '🟢',
+                    icon: <BenefitIcon variant="fee" />,
                     title: 'No Maintenance Fee',
                     description: 'Free application and zero maintenance fees.',
                 },
                 {
-                    icon: '✅',
+                    icon: <BenefitIcon variant="shield" />,
                     title: 'Safe and Secure',
                     description: 'CBN licensed, NDIC insured.',
                 },
@@ -295,22 +344,22 @@ function Dashboard({ theme = 'light', onToggleTheme }) {
             showcaseClassName: 'cards-showcase-card physical',
             benefits: [
                 {
-                    icon: '🆓',
+                    icon: <BenefitIcon variant="fee" />,
                     title: 'Free Application and Usage',
                     description: 'Free application and zero maintenance fees.',
                 },
                 {
-                    icon: '🌍',
+                    icon: <BenefitIcon variant="global" />,
                     title: 'Works Everywhere',
                     description: 'Accepted for online payments, POS, and ATM transactions globally.',
                 },
                 {
-                    icon: '🎁',
+                    icon: <BenefitIcon variant="tools" />,
                     title: 'Exclusive Benefits',
                     description: 'Enjoy special offers and discounts at selected merchants.',
                 },
                 {
-                    icon: '🛡',
+                    icon: <BenefitIcon variant="shield" />,
                     title: 'Maximum Security',
                     description: 'Secure transactions with strict fraud protection.',
                 },
@@ -490,7 +539,11 @@ function Dashboard({ theme = 'light', onToggleTheme }) {
                                     </span>
                                     <span>Withdraw</span>
                                 </button>
-                                <button className="action-btn" title="Pay utility and service bills">
+                                <button
+                                    className="action-btn"
+                                    title="Pay utility and service bills"
+                                    onClick={() => setShowBillsUnavailableModal(true)}
+                                >
                                     <span className="icon" aria-hidden="true">
                                         <svg viewBox="0 0 24 24" fill="none">
                                             <path d="M7 3h10v18l-2-1.3L13 21l-2-1.3L9 21l-2-1.3L5 21V3h2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -854,6 +907,21 @@ function Dashboard({ theme = 'light', onToggleTheme }) {
                             type="button"
                             className="feature-modal-btn"
                             onClick={() => setShowWithdrawUnavailableModal(false)}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            {showBillsUnavailableModal && (
+                <div className="feature-modal-overlay" role="dialog" aria-modal="true" aria-label="Bills unavailable">
+                    <div className="feature-modal-card">
+                        <h3>Feature not yet available</h3>
+                        <p>Pay Bills is coming soon. Please check back later for utilities and bill payments.</p>
+                        <button
+                            type="button"
+                            className="feature-modal-btn"
+                            onClick={() => setShowBillsUnavailableModal(false)}
                         >
                             Close
                         </button>

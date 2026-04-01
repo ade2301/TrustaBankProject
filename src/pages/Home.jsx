@@ -109,7 +109,7 @@ function Home() {
   }
 
   return (
-    <div className="page page-load">
+    <div className="page page-load home-page">
       <RevealSection className="hero-section home-hero-mobile" delay={0.1}>
         <div className="hero-copy">
           <p className="eyebrow hero-seq hero-1">Trusta Bank</p>
@@ -119,7 +119,7 @@ function Home() {
           </p>
           <div className="hero-actions hero-seq hero-4">
             <Button to="/register">Get Started</Button>
-            <Button variant="outline" to="/login">
+            <Button variant="outline" to="/login" className="hero-login-btn">
               Login
             </Button>
           </div>

@@ -121,6 +121,24 @@ const featureCategories = [
   },
 ]
 
+const pickFeatureIcon = (title) => {
+  if (/transfer|payout/i.test(title)) return 'transfer'
+  if (/remittance|international/i.test(title)) return 'globe'
+  if (/bill|invoice/i.test(title)) return 'bill'
+  if (/airtime|data/i.test(title)) return 'mobile'
+  if (/scheduled/i.test(title)) return 'calendar'
+  if (/link/i.test(title)) return 'link'
+  if (/encryption|security|authentication|access/i.test(title)) return 'lock'
+  if (/fraud/i.test(title)) return 'alert'
+  if (/device/i.test(title)) return 'device'
+  if (/save|savings/i.test(title)) return 'wallet'
+  if (/budget|yield|investment/i.test(title)) return 'chart'
+  if (/team|role/i.test(title)) return 'users'
+  if (/business/i.test(title)) return 'briefcase'
+  if (/api/i.test(title)) return 'api'
+  return 'flow'
+}
+
 function Features() {
   return (
     <div className="page page-load">
@@ -138,7 +156,7 @@ function Features() {
             <div className="feature-grid features-3col">
               {category.features.map((feature) => (
                 <Card key={feature.title} className="feature-card card-glass">
-                  <CardLogo />
+                  <CardLogo variant={pickFeatureIcon(feature.title)} />
                   <h3>{feature.title}</h3>
                   <p>{feature.description}</p>
                 </Card>

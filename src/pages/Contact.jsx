@@ -43,6 +43,15 @@ const contactMethods = [
     },
 ]
 
+const pickContactIcon = (title) => {
+    if (/email/i.test(title)) return 'mail'
+    if (/live chat|whatsapp/i.test(title)) return 'chat'
+    if (/phone/i.test(title)) return 'phone'
+    if (/social/i.test(title)) return 'globe'
+    if (/branch|appointment/i.test(title)) return 'building'
+    return 'flow'
+}
+
 function Contact() {
     return (
         <div className="page page-load">
@@ -60,7 +69,7 @@ function Contact() {
                 <div className="contact-methods">
                     {contactMethods.map((method) => (
                         <Card key={method.title} className="contact-card card-glass">
-                            <CardLogo />
+                            <CardLogo variant={pickContactIcon(method.title)} />
                             <h3>{method.title}</h3>
                             <p className="contact-desc">{method.description}</p>
                             <div className="contact-info">

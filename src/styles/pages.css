@@ -2230,21 +2230,21 @@
   }
 
   .home-page .step-card {
-    padding: 1.75rem 1.25rem 1.6rem;
-    gap: 1.4rem;
+    padding: 2rem 1.3rem 1.85rem;
+    gap: 1.8rem;
   }
 
   .home-page .step-index {
-    margin-bottom: 1.45rem;
+    margin-bottom: 1.85rem;
   }
 
   .home-page .step-card h3 {
-    margin-top: 0.45rem;
+    margin-top: 0.65rem;
   }
 
   .home-page .step-card p {
-    margin-top: 0.42rem;
-    line-height: 1.65;
+    margin-top: 0.55rem;
+    line-height: 1.72;
   }
 
   .about-page .metric-value {
@@ -2298,6 +2298,24 @@
 
   .jobs-list {
     gap: 0.8rem;
+  }
+
+  .home-page .step-card {
+    padding: 2.1rem 1.2rem 1.9rem;
+    gap: 1.85rem;
+  }
+
+  .home-page .step-index {
+    margin-bottom: 1.95rem;
+  }
+
+  .home-page .step-card h3 {
+    margin-top: 0.7rem;
+  }
+
+  .home-page .step-card p {
+    margin-top: 0.6rem;
+    line-height: 1.75;
   }
 
   .feature-card {

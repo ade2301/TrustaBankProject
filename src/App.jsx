@@ -42,11 +42,7 @@ function HomeRoute() {
     return null
   }
 
-  if (isAuthenticated) {
-    if (!isSessionUnlocked) {
-      return <Navigate to="/login" replace />
-    }
-
+  if (isAuthenticated && isSessionUnlocked) {
     return <Navigate to={user?.isOnboarded ? '/dashboard' : '/onboarding'} replace />
   }
 

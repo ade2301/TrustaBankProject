@@ -76,7 +76,9 @@ export function AuthProvider({ children }) {
         const response = await verifyLoginOtp(payload)
         setUser(response.user)
         rememberPinProfile(response.user)
-        persistSessionUnlocked(true)
+
+        const shouldRequirePinUnlock = Boolean(response.user?.isOnboarded && response.user?.hasLoginPin)
+        persistSessionUnlocked(!shouldRequirePinUnlock)
 
         try {
             await recognizeDevice(getDeviceId())

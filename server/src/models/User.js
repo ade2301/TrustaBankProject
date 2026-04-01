@@ -47,6 +47,29 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isDemoAccount: {
+      type: Boolean,
+      default: false,
+    },
+    walletBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalIncome: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalExpenses: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    loginBonusGranted: {
+      type: Boolean,
+      default: false,
+    },
     personalInfo: {
       dateOfBirth: String,
       gender: String,

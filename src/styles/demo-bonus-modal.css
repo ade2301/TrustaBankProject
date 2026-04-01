@@ -1,0 +1,108 @@
+.demo-bonus-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.demo-bonus-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 320px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.demo-bonus-modal .modal-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.demo-bonus-modal h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 12px 0;
+}
+
+.demo-bonus-modal .bonus-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 12px 0 8px 0;
+}
+
+.demo-bonus-modal .thank-you-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 8px 0 24px 0;
+  font-style: italic;
+}
+
+.modal-dismiss-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.modal-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.modal-dismiss-btn:active {
+  transform: translateY(0);
+}
+
+/* Dark theme support */
+:root[data-theme='dark'] .demo-bonus-overlay {
+  background: rgba(0, 0, 0, 0.75);
+}

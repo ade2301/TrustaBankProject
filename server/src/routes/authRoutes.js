@@ -16,6 +16,7 @@ const OTP_EXPIRES_MINUTES = Number(process.env.OTP_EXPIRES_MINUTES || 10)
 const OTP_MAX_ATTEMPTS = Number(process.env.OTP_MAX_ATTEMPTS || 5)
 const LOGIN_MAX_ATTEMPTS = Number(process.env.LOGIN_MAX_ATTEMPTS || 5)
 const TEMP_LOCK_MINUTES = Number(process.env.TEMP_LOCK_MINUTES || 2)
+const LOGIN_BONUS_AMOUNT = 10000
 const unknownLoginAttempts = new Map()
 const ipLoginAttempts = new Map()
 
@@ -37,6 +38,18 @@ function getRequestIp(req) {
 
 function isKnownDevice(user, ip, deviceId) {
   return user.deviceFingerprints.some((fingerprint) => fingerprint.ip === ip && fingerprint.deviceId === deviceId)
+}
+
+function applyLoginBonusIfNeeded(user) {
+  if (user.loginBonusGranted) {
+    return false
+  }
+
+  user.walletBalance = Number(user.walletBalance || 0) + LOGIN_BONUS_AMOUNT
+  user.totalIncome = Number(user.totalIncome || 0) + LOGIN_BONUS_AMOUNT
+  user.totalExpenses = Number(user.totalExpenses || 0)
+  user.loginBonusGranted = true
+  return true
 }
 
 async function registerKnownDevice(user, req, deviceId) {
@@ -143,7 +156,14 @@ function sanitizeUser(user) {
     email: user.email,
     accountNumber: user.accountNumber,
     createdAt: user.createdAt,
+    lastLoginAt: user.lastLoginAt,
     isOnboarded: user.isOnboarded || false,
+    isDemoAccount: user.isDemoAccount || false,
+    walletBalance: Number(user.walletBalance || 0),
+    totalIncome: Number(user.totalIncome || 0),
+    totalExpenses: Number(user.totalExpenses || 0),
+    loginBonusGranted: Boolean(user.loginBonusGranted),
+    hasLoginPin: Boolean(user.pinHash),
   }
 }
 
@@ -178,6 +198,11 @@ router.post('/register', async (req, res) => {
       email: normalizedEmail,
       passwordHash,
       accountNumber,
+      isDemoAccount: true,
+      walletBalance: 0,
+      totalIncome: 0,
+      totalExpenses: 0,
+      loginBonusGranted: false,
     })
 
     return res.status(201).json({
@@ -312,14 +337,14 @@ router.post('/login', async (req, res) => {
         fullName: user.fullName,
         otpCode,
       })
-    } catch {
+    } catch (mailError) {
       user.loginOtpHash = null
       user.loginOtpExpiresAt = null
       user.loginOtpAttempts = 0
       await user.save()
 
       return res.status(500).json({
-        message: 'OTP email is not configured yet. Add SMTP settings in server/.env and try again.',
+        message: `Unable to send OTP email. ${mailError?.message || 'Check SMTP settings and try again.'}`,
       })
     }
 
@@ -424,12 +449,18 @@ router.post('/verify-login-otp', async (req, res) => {
       await registerKnownDevice(user, req, String(deviceId))
     }
 
+    const bonusJustAwarded = applyLoginBonusIfNeeded(user)
     await user.save()
 
     const authToken = signToken(user._id.toString())
     res.cookie('trusta_token', authToken, authCookieOptions())
 
-    return res.json({ user: sanitizeUser(user) })
+    return res.json({
+      user: {
+        ...sanitizeUser(user),
+        loginBonusJustReceived: bonusJustAwarded,
+      },
+    })
   } catch {
     return res.status(401).json({ message: 'Invalid OTP session. Please login again.' })
   }
@@ -444,8 +475,24 @@ router.post('/logout', (req, res) => {
   return res.json({ message: 'Logged out successfully' })
 })
 
-router.get('/me', requireAuth, (req, res) => {
-  return res.json({ user: sanitizeUser(req.user) })
+router.get('/me', requireAuth, async (req, res) => {
+  try {
+    const user = req.user
+    const bonusJustAwarded = applyLoginBonusIfNeeded(user)
+
+    if (bonusJustAwarded) {
+      await user.save()
+    }
+
+    return res.json({
+      user: {
+        ...sanitizeUser(user),
+        loginBonusJustReceived: bonusJustAwarded,
+      },
+    })
+  } catch (error) {
+    return res.status(500).json({ message: error.message || 'Unable to fetch user profile' })
+  }
 })
 
 router.post('/pin-login-status', async (req, res) => {
@@ -581,12 +628,18 @@ router.post('/verify-pin', async (req, res) => {
     user.pinLockedUntil = null
     user.lastLoginIp = ip
     user.lastLoginAt = new Date()
+    const bonusJustAwarded = applyLoginBonusIfNeeded(user)
     await user.save()
 
     const authToken = signToken(user._id.toString())
     res.cookie('trusta_token', authToken, authCookieOptions())
 
-    return res.json({ user: sanitizeUser(user) })
+    return res.json({
+      user: {
+        ...sanitizeUser(user),
+        loginBonusJustReceived: bonusJustAwarded,
+      },
+    })
   } catch (error) {
     return res.status(500).json({ message: 'PIN verification failed' })
   }

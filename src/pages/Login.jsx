@@ -190,7 +190,32 @@ function Login() {
         setSuccessMessage('OTP sent. Check your email and enter the 6-digit code.')
       } else {
         const authenticatedUser = await verifyOtp({ otpToken, otp, deviceId })
-        navigate(authenticatedUser?.isOnboarded ? '/dashboard' : '/onboarding')
+
+        if (!authenticatedUser?.isOnboarded) {
+          navigate('/onboarding')
+          return
+        }
+
+        if (authenticatedUser?.hasLoginPin) {
+          setOtpToken('')
+          setOtp('')
+          setPassword('')
+          setErrorMessage('')
+          setSuccessMessage('OTP verified. Enter your 6-digit PIN to continue.')
+
+          const firstName = String(authenticatedUser.fullName || '').split(' ')[0] || 'User'
+          setRememberedProfile({
+            email: authenticatedUser.email,
+            firstName,
+            maskedAccount: `${String(authenticatedUser.accountNumber || '').slice(0, 2)}********`,
+          })
+
+          setShowPinSplash(true)
+          window.setTimeout(() => setShowPinSplash(false), 900)
+          return
+        }
+
+        navigate('/dashboard')
       }
     } catch (requestError) {
       const remainingAttempts =

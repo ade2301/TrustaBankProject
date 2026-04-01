@@ -60,13 +60,22 @@ router.get('/banks', requireAuth, async (req, res) => {
         }
 
         const banks = Array.isArray(data.data)
-            ? data.data
-                .filter((bank) => bank?.active === true)
-                .map((bank) => ({
-                    code: String(bank.code),
-                    name: String(bank.name),
-                }))
-                .sort((a, b) => a.name.localeCompare(b.name))
+            ? (() => {
+                const uniqueByCode = new Map()
+
+                data.data
+                    .filter((bank) => bank?.active === true)
+                    .forEach((bank) => {
+                        const code = String(bank.code || '').trim()
+                        const name = String(bank.name || '').trim()
+
+                        if (code && name && !uniqueByCode.has(code)) {
+                            uniqueByCode.set(code, { code, name })
+                        }
+                    })
+
+                return [...uniqueByCode.values()].sort((a, b) => a.name.localeCompare(b.name))
+            })()
             : []
 
         return res.json({ banks })
@@ -135,7 +144,7 @@ router.post('/validate-account', requireAuth, async (req, res) => {
 
                 const data = await response.json()
 
-                if (data.status) {
+                if (response.ok && data?.status) {
                     return res.json({
                         account: {
                             accountName: data.data.account_name,
@@ -143,9 +152,11 @@ router.post('/validate-account', requireAuth, async (req, res) => {
                             bankCode,
                         },
                     })
-                } else {
-                    return res.status(404).json({ message: 'Account not found on selected bank' })
                 }
+
+                return res.status(400).json({
+                    message: data?.message || 'Account not found on selected bank',
+                })
             } catch (error) {
                 console.error('Paystack validation error:', error.message)
                 return res.status(400).json({

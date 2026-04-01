@@ -1,4 +1,5 @@
-const API_BASE = '/api/auth'
+const API_ROOT = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const API_BASE = `${API_ROOT}/api/auth`
 
 async function request(path, options = {}) {
   let response

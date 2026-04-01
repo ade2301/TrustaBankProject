@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Button from '../components/Button'
 import PinInput from '../components/PinInput'
+import { completeOnboarding, setupPins } from '../lib/authApi'
 import '../styles/onboarding.css'
 
 function Onboarding() {
@@ -105,20 +106,7 @@ function Onboarding() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/setup-pins', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          pin: pins.pin,
-          transactionPin: pins.transactionPin,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Failed to setup PINs')
-      }
+      await setupPins(pins.pin, pins.transactionPin)
 
       setSuccessMessage('PINs created successfully!')
       setCurrentStep(4)
@@ -134,20 +122,7 @@ function Onboarding() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/complete-onboarding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          personalInfo,
-          contactInfo,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Failed to complete onboarding')
-      }
+      await completeOnboarding(personalInfo, contactInfo)
 
       setSuccessMessage('Onboarding completed successfully!')
       await refreshSession()

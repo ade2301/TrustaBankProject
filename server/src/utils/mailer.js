@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 
-let transporter
+const transporterCache = new Map()
 
 function getEmailContent(fullName, otpCode) {
     return {
@@ -16,39 +16,48 @@ function createTransporter(portOverride) {
     const port = Number.isFinite(rawPort) && rawPort > 0 ? rawPort : 587
     const user = process.env.SMTP_USER
     const pass = String(process.env.SMTP_PASS || '').replace(/\s+/g, '')
-    const service = String(process.env.SMTP_SERVICE || 'gmail').trim().toLowerCase()
 
     if (!host || !user || !pass) {
         throw new Error('SMTP_HOST, SMTP_USER, and SMTP_PASS must be configured for OTP email delivery')
     }
 
     return nodemailer.createTransport({
-        service,
-        host,
+        host: host.trim(),
         port,
         secure: port === 465,
-        connectionTimeout: 30000,
-        greetingTimeout: 30000,
-        socketTimeout: 30000,
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000,
         auth: {
-            user,
+            user: user.trim(),
             pass,
         },
     })
 }
 
-function getTransporter() {
-    if (!transporter) {
-        transporter = createTransporter()
+function getTransporter(port) {
+    const cacheKey = String(port || process.env.SMTP_PORT || 587)
+    const cachedTransporter = transporterCache.get(cacheKey)
+
+    if (cachedTransporter) {
+        return cachedTransporter
     }
 
-    return transporter
+    const newTransporter = createTransporter(port)
+    transporterCache.set(cacheKey, newTransporter)
+    return newTransporter
+}
+
+function getSmtpPorts() {
+    const configuredPort = Number(process.env.SMTP_PORT || 587)
+    const primaryPort = Number.isFinite(configuredPort) && configuredPort > 0 ? configuredPort : 587
+    const fallbackPort = primaryPort === 465 ? 587 : 465
+
+    return [primaryPort, fallbackPort].filter((port, index, ports) => ports.indexOf(port) === index)
 }
 
 export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
     const content = getEmailContent(fullName, otpCode)
-    const configuredPort = Number(process.env.SMTP_PORT || 587)
-    const port = Number.isFinite(configuredPort) && configuredPort > 0 ? configuredPort : 587
     const from = process.env.SMTP_FROM || process.env.SMTP_USER
 
     const mailOptions = {
@@ -63,24 +72,29 @@ export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
         from,
         to,
         smtpHost: process.env.SMTP_HOST,
-        smtpService: process.env.SMTP_SERVICE || 'gmail',
         smtpUser: process.env.SMTP_USER,
-        smtpPort: port,
+        smtpPorts: getSmtpPorts(),
     })
 
-    let lastError = null
+    const errors = []
 
-    try {
-        const mailer = getTransporter()
-        const info = await mailer.sendMail(mailOptions)
+    for (const port of getSmtpPorts()) {
+        try {
+            const mailer = getTransporter(port)
+            const info = await mailer.sendMail(mailOptions)
 
-        transporter = mailer
-        console.log(`OTP email sent via SMTP on port ${port}:`, info.response)
-        return info
-    } catch (error) {
-        lastError = error
-        console.error(`SMTP OTP send failed on port ${port}:`, error)
+            console.log(`OTP email sent via SMTP on port ${port}:`, info.response)
+            return info
+        } catch (error) {
+            errors.push({ port, error })
+            transporterCache.delete(String(port))
+            console.error(`SMTP OTP send failed on port ${port}:`, error)
+        }
     }
 
-    throw lastError || new Error('Unable to send OTP email over SMTP. Check SMTP settings.')
+    const message = errors.length
+        ? errors.map(({ port, error }) => `[${port}] ${error?.message || String(error)}`).join(' | ')
+        : 'Unable to send OTP email over SMTP. Check SMTP settings.'
+
+    throw new Error(message)
 }

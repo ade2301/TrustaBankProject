@@ -356,11 +356,6 @@ router.post('/login', async (req, res) => {
         otpCode,
       })
     } catch (mailError) {
-      user.loginOtpHash = null
-      user.loginOtpExpiresAt = null
-      user.loginOtpAttempts = 0
-      await user.save()
-
       return res.status(500).json({
         message: `Unable to send OTP email. ${mailError?.message || 'Check SMTP settings and try again.'}`,
       })

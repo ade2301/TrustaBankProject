@@ -40,6 +40,31 @@ function isKnownDevice(user, ip, deviceId) {
   return user.deviceFingerprints.some((fingerprint) => fingerprint.ip === ip && fingerprint.deviceId === deviceId)
 }
 
+async function verifyStoredLoginPin(pin, pinHash) {
+  const normalizedPin = String(pin)
+  const normalizedHash = String(pinHash || '')
+
+  if (!normalizedHash) {
+    return false
+  }
+
+  try {
+    // Support both current Argon2 hashes and legacy bcrypt hashes.
+    if (normalizedHash.startsWith('$2a$') || normalizedHash.startsWith('$2b$') || normalizedHash.startsWith('$2y$')) {
+      return await bcrypt.compare(normalizedPin, normalizedHash)
+    }
+
+    if (normalizedHash.startsWith('$argon2')) {
+      return await argon2.verify(normalizedHash, normalizedPin)
+    }
+
+    return false
+  } catch (error) {
+    console.error('Login PIN hash verification error:', error)
+    return false
+  }
+}
+
 function applyLoginBonusIfNeeded(user) {
   if (user.loginBonusGranted) {
     return false
@@ -610,8 +635,8 @@ router.post('/verify-pin', async (req, res) => {
       user.pinLockedUntil = null
     }
 
-    // Validate PIN with Argon2
-    const isValidPin = await argon2.verify(user.pinHash, String(pin))
+    // Validate PIN against supported hash formats.
+    const isValidPin = await verifyStoredLoginPin(pin, user.pinHash)
 
     if (!isValidPin) {
       user.failedPinAttempts += 1
@@ -654,6 +679,7 @@ router.post('/verify-pin', async (req, res) => {
       },
     })
   } catch (error) {
+    console.error('PIN verification route error:', error)
     return res.status(500).json({ message: 'PIN verification failed' })
   }
 })

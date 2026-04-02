@@ -128,9 +128,6 @@ SMTP_SERVICE=gmail
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-16-char-app-password
 SMTP_FROM=Trusta Bank <your-email@gmail.com>
-MAIL_PROVIDER=auto
-RESEND_API_KEY=your_resend_api_key
-RESEND_FROM=Trusta Bank <onboarding@your-domain.com>
 PAYSTACK_SECRET_KEY=your_paystack_secret_key
 ```
 

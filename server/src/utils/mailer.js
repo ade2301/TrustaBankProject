@@ -10,18 +10,6 @@ function getEmailContent(fullName, otpCode) {
     }
 }
 
-function getMailProvider() {
-    return String(process.env.MAIL_PROVIDER || 'auto').trim().toLowerCase()
-}
-
-function getResendApiKey() {
-    return String(process.env.RESEND_API_KEY || '').trim()
-}
-
-function getResendFrom() {
-    return String(process.env.RESEND_FROM || process.env.SMTP_FROM || '').trim()
-}
-
 function createTransporter(portOverride) {
     const host = process.env.SMTP_HOST
     const rawPort = Number(portOverride || process.env.SMTP_PORT || 587)
@@ -57,47 +45,7 @@ function getTransporter() {
     return transporter
 }
 
-async function sendViaResend({ to, fullName, otpCode }) {
-    const apiKey = getResendApiKey()
-    const from = getResendFrom()
-
-    if (!apiKey) {
-        throw new Error('RESEND_API_KEY is required when MAIL_PROVIDER is set to resend')
-    }
-
-    if (!from) {
-        throw new Error('RESEND_FROM (or SMTP_FROM) must be set for Resend email delivery')
-    }
-
-    const content = getEmailContent(fullName, otpCode)
-
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            from,
-            to,
-            subject: content.subject,
-            text: content.text,
-            html: content.html,
-        }),
-    })
-
-    const payload = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-        const message = payload?.message || payload?.error || 'Resend API request failed'
-        throw new Error(`Resend delivery failed: ${message}`)
-    }
-
-    console.log('OTP email sent via Resend:', { to, id: payload?.id || null })
-    return payload
-}
-
-async function sendViaSmtp({ to, fullName, otpCode }) {
+export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
     const content = getEmailContent(fullName, otpCode)
     const configuredPort = Number(process.env.SMTP_PORT || 587)
     const port = Number.isFinite(configuredPort) && configuredPort > 0 ? configuredPort : 587
@@ -135,26 +83,4 @@ async function sendViaSmtp({ to, fullName, otpCode }) {
     }
 
     throw lastError || new Error('Unable to send OTP email over SMTP. Check SMTP settings.')
-}
-
-export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
-    const provider = getMailProvider()
-
-    if (provider === 'resend') {
-        return sendViaResend({ to, fullName, otpCode })
-    }
-
-    if (provider === 'smtp') {
-        return sendViaSmtp({ to, fullName, otpCode })
-    }
-
-    if (getResendApiKey()) {
-        try {
-            return await sendViaResend({ to, fullName, otpCode })
-        } catch (resendError) {
-            console.error('Resend delivery failed in auto mode, falling back to SMTP:', resendError)
-        }
-    }
-
-    return sendViaSmtp({ to, fullName, otpCode })
 }

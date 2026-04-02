@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Input from '../components/Input'
@@ -95,7 +95,7 @@ function Login() {
     return `${mins}:${String(secs).padStart(2, '0')}`
   }, [lockSeconds])
 
-  const submitPinLogin = async () => {
+  const submitPinLogin = useCallback(async () => {
     if (!isPinLoginMode || lockSeconds > 0 || isSubmitting) {
       return
     }
@@ -133,7 +133,7 @@ function Login() {
     } finally {
       setIsSubmitting(false)
     }
-  }
+  }, [isPinLoginMode, lockSeconds, isSubmitting, loginPin, verifyPin, rememberedProfile, navigate])
 
   useEffect(() => {
     if (!isPinLoginMode || lockSeconds > 0 || loginPin.length !== 6) {
@@ -141,7 +141,7 @@ function Login() {
     }
 
     void submitPinLogin()
-  }, [isPinLoginMode, lockSeconds, loginPin])
+  }, [isPinLoginMode, lockSeconds, loginPin, submitPinLogin])
 
   const appendPinDigit = (digit) => {
     if (isSubmitting || lockSeconds > 0) {

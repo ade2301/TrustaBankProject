@@ -33,11 +33,6 @@ function Onboarding() {
     transactionPinError: '',
   })
 
-  const [pinInput, setPinInput] = useState({
-    pin: '',
-    transactionPin: '',
-  })
-
   const sanitizeTextOnly = (value) => String(value).replace(/[^A-Za-z\s'-]/g, '')
   const sanitizePhone = (value) => String(value).replace(/\D/g, '').slice(0, 15)
   const sanitizeAddress = (value) => String(value).replace(/[^A-Za-z0-9\s]/g, '')
@@ -280,7 +275,6 @@ function Onboarding() {
                 <PinInput
                   length={6}
                   onChange={(value) => {
-                    setPinInput((prev) => ({ ...prev, pin: value }))
                     setPins((prev) => ({ ...prev, pin: value, pinError: '' }))
                   }}
                   error={pins.pinError}
@@ -293,7 +287,6 @@ function Onboarding() {
                 <PinInput
                   length={4}
                   onChange={(value) => {
-                    setPinInput((prev) => ({ ...prev, transactionPin: value }))
                     setPins((prev) => ({ ...prev, transactionPin: value, transactionPinError: '' }))
                   }}
                   error={pins.transactionPinError}

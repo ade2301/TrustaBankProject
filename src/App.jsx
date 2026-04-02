@@ -95,11 +95,10 @@ function OnboardingRoute({ children }) {
 
 function App() {
   const location = useLocation()
-  const { isLoading, isAuthenticated, isSessionUnlocked, user } = useAuth()
+  const { isLoading } = useAuth()
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/register'
   const isDashboardRoute = location.pathname === '/dashboard'
   const isOnboardingRoute = location.pathname === '/onboarding'
-  const [showDashboardSplash, setShowDashboardSplash] = useState(false)
   const [theme, setTheme] = useState(() => {
     const storedTheme = window.localStorage.getItem('trusta-theme')
     return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'light'
@@ -115,42 +114,12 @@ function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [location.pathname])
 
-  useEffect(() => {
-    if (isLoading) {
-      return undefined
-    }
-
-    const shouldShowDashboardSplash =
-      location.pathname === '/dashboard' &&
-      isAuthenticated &&
-      isSessionUnlocked &&
-      Boolean(user?.isOnboarded)
-
-    if (!shouldShowDashboardSplash) {
-      setShowDashboardSplash(false)
-      return undefined
-    }
-
-    setShowDashboardSplash(true)
-    const timer = window.setTimeout(() => {
-      setShowDashboardSplash(false)
-    }, 1300)
-
-    return () => {
-      window.clearTimeout(timer)
-    }
-  }, [location.pathname, isAuthenticated, isSessionUnlocked, user, isLoading])
-
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
   }
 
   if (isLoading) {
     return <AppSplash message="Loading your secure session..." />
-  }
-
-  if (showDashboardSplash) {
-    return <AppSplash message="Preparing your dashboard..." />
   }
 
   return (

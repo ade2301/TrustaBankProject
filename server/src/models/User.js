@@ -79,12 +79,6 @@ const userSchema = new mongoose.Schema(
     contactInfo: {
       phoneNumber: String,
       physicalAddress: String,
-      verified: Boolean,
-      default: false,
-    },
-    contactInfo: {
-      phoneNumber: String,
-      physicalAddress: String,
       verified: {
         type: Boolean,
         default: false,

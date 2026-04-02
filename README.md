@@ -122,6 +122,12 @@ In your `/server` folder, create a `.env` file and add:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SERVICE=gmail
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-16-char-app-password
+SMTP_FROM=Trusta Bank <your-email@gmail.com>
 PAYSTACK_SECRET_KEY=your_paystack_secret_key
 ```
 

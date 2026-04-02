@@ -8,22 +8,20 @@ function createTransporter(portOverride) {
     const port = Number.isFinite(rawPort) && rawPort > 0 ? rawPort : 587
     const user = process.env.SMTP_USER
     const pass = String(process.env.SMTP_PASS || '').replace(/\s+/g, '')
+    const service = String(process.env.SMTP_SERVICE || 'gmail').trim().toLowerCase()
 
     if (!host || !user || !pass) {
         throw new Error('SMTP_HOST, SMTP_USER, and SMTP_PASS must be configured for OTP email delivery')
     }
 
     return nodemailer.createTransport({
+        service,
         host,
         port,
         secure: port === 465,
-        requireTLS: port !== 465,
-        connectionTimeout: 12000,
-        greetingTimeout: 12000,
-        socketTimeout: 12000,
-        tls: {
-            minVersion: 'TLSv1.2',
-        },
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 30000,
         auth: {
             user,
             pass,
@@ -42,10 +40,8 @@ function getTransporter() {
 function getPortAttempts() {
     const configured = Number(process.env.SMTP_PORT || 587)
     const primary = Number.isFinite(configured) && configured > 0 ? configured : 587
-    const fallback = primary === 465 ? 587 : 465
 
-    // Try configured port first, then the alternate SMTP submission port.
-    return [primary, fallback]
+    return [primary]
 }
 
 export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
@@ -63,6 +59,7 @@ export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
         to,
         subject: 'Your Trusta login OTP',
         smtpHost: process.env.SMTP_HOST,
+        smtpService: process.env.SMTP_SERVICE || 'gmail',
         smtpUser: process.env.SMTP_USER,
     })
 
@@ -80,7 +77,7 @@ export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
             return info
         } catch (error) {
             lastError = error
-            console.error(`❌ Failed to send OTP email on port ${port}:`, error.message)
+            console.error(`❌ Failed to send OTP email on port ${port}:`, error)
         }
     }
 

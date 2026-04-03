@@ -7,25 +7,34 @@
 
 .pin-input-group {
   display: flex;
-  gap: 12px;
+  gap: clamp(6px, 2.5vw, 12px);
   justify-content: center;
   width: 100%;
 }
 
 .pin-input {
-  width: 52px;
-  height: 52px;
+  flex: 1 1 0;
+  width: 100%;
+  max-width: 52px;
+  min-width: 0;
+  height: clamp(40px, 12vw, 52px);
   border: 2px solid var(--border);
   border-radius: 12px;
   background: var(--input-bg);
   color: var(--text);
-  font-size: 24px;
+  font-size: clamp(18px, 5vw, 24px);
   font-weight: 600;
   text-align: center;
   transition: all 0.2s ease;
   font-family: 'Inter', monospace;
   -webkit-appearance: none;
   appearance: none;
+}
+
+@media (max-width: 360px) {
+  .pin-input {
+    border-radius: 10px;
+  }
 }
 
 .pin-input:focus {

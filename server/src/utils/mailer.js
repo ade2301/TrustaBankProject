@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 const transporterCache = new Map()
+let resendClient = null
 
 function getEmailContent(fullName, otpCode) {
     return {
@@ -35,6 +37,40 @@ function createTransporter(portOverride) {
     })
 }
 
+function getMailProvider() {
+    const provider = String(process.env.MAIL_PROVIDER || 'smtp').toLowerCase().trim()
+
+    if (provider === 'resend' || provider === 'smtp' || provider === 'auto') {
+        return provider
+    }
+
+    throw new Error('MAIL_PROVIDER must be one of: smtp, resend, auto')
+}
+
+function getResendClient() {
+    const apiKey = String(process.env.RESEND_API_KEY || '').trim()
+
+    if (!apiKey) {
+        throw new Error('RESEND_API_KEY must be configured when MAIL_PROVIDER is resend or auto')
+    }
+
+    if (!resendClient) {
+        resendClient = new Resend(apiKey)
+    }
+
+    return resendClient
+}
+
+function getResendFromAddress() {
+    const fromAddress = String(process.env.RESEND_FROM || process.env.SMTP_FROM || '').trim()
+
+    if (!fromAddress) {
+        throw new Error('RESEND_FROM must be configured when using Resend')
+    }
+
+    return fromAddress
+}
+
 function getTransporter(port) {
     const cacheKey = String(port || process.env.SMTP_PORT || 587)
     const cachedTransporter = transporterCache.get(cacheKey)
@@ -56,8 +92,32 @@ function getSmtpPorts() {
     return [primaryPort, fallbackPort].filter((port, index, ports) => ports.indexOf(port) === index)
 }
 
-export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
-    const content = getEmailContent(fullName, otpCode)
+async function sendViaResend({ to, content }) {
+    const resend = getResendClient()
+    const from = getResendFromAddress()
+
+    console.log('Sending OTP email via Resend:', {
+        from,
+        to,
+    })
+
+    const response = await resend.emails.send({
+        from,
+        to,
+        subject: content.subject,
+        text: content.text,
+        html: content.html,
+    })
+
+    if (response?.error) {
+        throw new Error(`Resend delivery failed: ${response.error.message || 'Unknown Resend error'}`)
+    }
+
+    console.log('OTP email sent via Resend:', response?.data?.id || 'no-id')
+    return response
+}
+
+async function sendViaSmtp({ to, content }) {
     const from = process.env.SMTP_FROM || process.env.SMTP_USER
 
     const mailOptions = {
@@ -97,4 +157,24 @@ export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
         : 'Unable to send OTP email over SMTP. Check SMTP settings.'
 
     throw new Error(message)
+}
+
+export async function sendLoginOtpEmail({ to, fullName, otpCode }) {
+    const content = getEmailContent(fullName, otpCode)
+    const provider = getMailProvider()
+
+    if (provider === 'resend') {
+        return sendViaResend({ to, content })
+    }
+
+    if (provider === 'smtp') {
+        return sendViaSmtp({ to, content })
+    }
+
+    try {
+        return await sendViaResend({ to, content })
+    } catch (resendError) {
+        console.error('Resend send failed in auto mode, falling back to SMTP:', resendError)
+        return sendViaSmtp({ to, content })
+    }
 }

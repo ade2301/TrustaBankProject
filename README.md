@@ -122,13 +122,21 @@ In your `/server` folder, create a `.env` file and add:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+MAIL_PROVIDER=smtp
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-16-char-app-password
 SMTP_FROM=Trusta Bank <your-email@gmail.com>
+RESEND_API_KEY=re_your_resend_api_key
+RESEND_FROM=Trusta Bank <no-reply@mail.yourdomain.com>
 PAYSTACK_SECRET_KEY=your_paystack_secret_key
 ```
+
+Email provider options:
+- `MAIL_PROVIDER=smtp` uses Nodemailer (Gmail SMTP)
+- `MAIL_PROVIDER=resend` uses Resend API (recommended in production)
+- `MAIL_PROVIDER=auto` tries Resend first, then falls back to SMTP
 
 Optional (frontend, only if not using Vite proxy):
 

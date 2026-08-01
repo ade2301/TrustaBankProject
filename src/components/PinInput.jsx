@@ -1,9 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import '../styles/pin-input.css'
 
-function PinInput({ length = 6, onComplete, onChange, error = null }) {
-  const [pin, setPin] = useState(new Array(length).fill(''))
+function normalizePinValue(value, length) {
+  return String(value ?? '')
+    .replace(/\D/g, '')
+    .slice(0, length)
+    .split('')
+    .concat(new Array(length).fill(''))
+    .slice(0, length)
+}
+
+function PinInput({ length = 6, value, onComplete, onChange, error = null }) {
+  const [pin, setPin] = useState(() => normalizePinValue(value, length))
   const inputRefs = useRef([])
+  const isControlled = typeof value !== 'undefined'
+  const displayedPin = isControlled ? normalizePinValue(value, length) : pin
 
   useEffect(() => {
     if (inputRefs.current[0]) {
@@ -16,9 +27,11 @@ function PinInput({ length = 6, onComplete, onChange, error = null }) {
     const digit = value.replace(/[^0-9]/g, '')
 
     if (digit === '' || digit.length <= 1) {
-      const newPin = [...pin]
+      const newPin = [...displayedPin]
       newPin[index] = digit
-      setPin(newPin)
+      if (!isControlled) {
+        setPin(newPin)
+      }
       onChange?.(newPin.join(''))
 
       if (digit && index < length - 1) {
@@ -36,7 +49,7 @@ function PinInput({ length = 6, onComplete, onChange, error = null }) {
   }
 
   const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !pin[index] && index > 0) {
+    if (e.key === 'Backspace' && !displayedPin[index] && index > 0) {
       inputRefs.current[index - 1].focus()
     }
 
@@ -55,8 +68,10 @@ function PinInput({ length = 6, onComplete, onChange, error = null }) {
     const digits = pastedData.replace(/[^0-9]/g, '').slice(0, length)
 
     if (digits.length > 0) {
-      const newPin = digits.split('').concat(new Array(length).fill('')).slice(0, length)
-      setPin(newPin)
+      const newPin = normalizePinValue(digits, length)
+      if (!isControlled) {
+        setPin(newPin)
+      }
       onChange?.(newPin.join(''))
 
       if (newPin.every((p) => p !== '')) {
@@ -73,7 +88,7 @@ function PinInput({ length = 6, onComplete, onChange, error = null }) {
   return (
     <div className="pin-input-container">
       <div className="pin-input-group">
-        {pin.map((digit, index) => (
+        {displayedPin.map((digit, index) => (
           <input
             key={index}
             ref={(el) => {

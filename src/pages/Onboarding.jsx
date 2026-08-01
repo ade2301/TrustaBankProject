@@ -274,6 +274,7 @@ function Onboarding() {
                 <p className="label-hint">You'll use this to login on recognized devices</p>
                 <PinInput
                   length={6}
+                  value={pins.pin}
                   onChange={(value) => {
                     setPins((prev) => ({ ...prev, pin: value, pinError: '' }))
                   }}
@@ -286,6 +287,7 @@ function Onboarding() {
                 <p className="label-hint">You'll need this to approve transactions</p>
                 <PinInput
                   length={4}
+                  value={pins.transactionPin}
                   onChange={(value) => {
                     setPins((prev) => ({ ...prev, transactionPin: value, transactionPinError: '' }))
                   }}

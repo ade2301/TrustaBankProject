@@ -30,7 +30,7 @@ function BlogPost() {
                     ) : (
                         <p>{post.coverLabel}</p>
                     )}
-                </div>
+                </div>  
 
                 <article className="blog-content card-glass">
                     {post.content.map((paragraph) => (

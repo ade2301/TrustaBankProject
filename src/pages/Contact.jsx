@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Card from '../components/Card'
@@ -53,6 +54,19 @@ const pickContactIcon = (title) => {
 }
 
 function Contact() {
+    const [submitMessage, setSubmitMessage] = useState('')
+
+    const handleSubmit = (event) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        const name = String(formData.get('name') || '').trim() || 'there'
+        const subject = String(formData.get('subject') || '').trim() || 'your message'
+
+        setSubmitMessage(`Thanks, ${name}. We received ${subject}. Our team will reach out soon.`)
+        event.currentTarget.reset()
+    }
+
     return (
         <div className="page page-load">
             <RevealSection className="section page-top-hero hero-theme-contact" delay={0.1}>
@@ -85,11 +99,12 @@ function Contact() {
                 <div className="contact-form-wrapper">
                     <Card className="card-glass">
                         <h2>Send us a message</h2>
-                        <form className="contact-form">
+                        <form className="contact-form" onSubmit={handleSubmit}>
                             <div className="form-row">
-                                <Input id="name" label="Full Name" type="text" filter="text" placeholder="Your name" required />
+                                <Input id="name" name="name" label="Full Name" type="text" filter="text" placeholder="Your name" required />
                                 <Input
                                     id="email"
+                                    name="email"
                                     label="Email Address"
                                     type="email"
                                     placeholder="your@email.com"
@@ -98,8 +113,8 @@ function Contact() {
                             </div>
 
                             <div className="form-row">
-                                <Input id="subject" label="Subject" type="text" filter="text" placeholder="How can we help?" required />
-                                <Input id="phone" label="Phone (Optional)" type="text" filter="numeric" inputMode="numeric" pattern="[0-9]*" placeholder="080..." />
+                                <Input id="subject" name="subject" label="Subject" type="text" filter="text" placeholder="How can we help?" required />
+                                <Input id="phone" name="phone" label="Phone (Optional)" type="text" filter="numeric" inputMode="numeric" pattern="[0-9]*" placeholder="080..." />
                             </div>
 
                             <div className="form-group">
@@ -111,12 +126,15 @@ function Contact() {
                                     className="form-textarea"
                                     placeholder="Tell us more..."
                                     rows="6"
+                                    name="message"
                                     onInput={(event) => {
                                         event.currentTarget.value = event.currentTarget.value.replace(/[^A-Za-z\s'-]/g, '')
                                     }}
                                     required
                                 />
                             </div>
+
+                            {submitMessage && <p className="form-status">{submitMessage}</p>}
 
                             <Button type="submit" fullWidth>
                                 Send Message

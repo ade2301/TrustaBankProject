@@ -1032,6 +1032,10 @@
   animation: ruleFadeIn 0.22s ease both;
 }
 
+.password-rules li.is-pending {
+  opacity: 0.9;
+}
+
 .password-rules li::before {
   content: '○';
   margin-right: 0.45rem;

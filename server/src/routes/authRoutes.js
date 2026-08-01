@@ -4,11 +4,13 @@ import { Router } from 'express'
 import argon2 from 'argon2'
 import { requireAuth } from '../middleware/auth.js'
 import User from '../models/User.js'
+import Transaction from '../models/Transaction.js'
 import { createUniqueAccountNumber } from '../utils/accountNumber.js'
 import { sendLoginOtpEmail } from '../utils/mailer.js'
 import { authCookieOptions, signToken, verifyToken } from '../utils/token.js'
 
 const router = Router()
+const MAINTENANCE_TOKEN = String(process.env.MAINTENANCE_TOKEN || '').trim()
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_RULES = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
@@ -208,6 +210,20 @@ function sanitizeUser(user) {
       verified: Boolean(user.contactInfo?.verified),
     },
   }
+}
+
+function requireMaintenanceToken(req, res, next) {
+  if (!MAINTENANCE_TOKEN) {
+    return res.status(503).json({ message: 'Maintenance token is not configured' })
+  }
+
+  const providedToken = String(req.headers['x-maintenance-token'] || '').trim()
+
+  if (!providedToken || providedToken !== MAINTENANCE_TOKEN) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  return next()
 }
 
 router.post('/register', async (req, res) => {
@@ -530,6 +546,26 @@ router.get('/me', requireAuth, async (req, res) => {
     })
   } catch (error) {
     return res.status(500).json({ message: error.message || 'Unable to fetch user profile' })
+  }
+})
+
+router.delete('/maintenance/delete-all-accounts', requireMaintenanceToken, async (req, res) => {
+  try {
+    const [userResult, transactionResult] = await Promise.all([
+      User.deleteMany({}),
+      Transaction.deleteMany({}),
+    ])
+
+    unknownLoginAttempts.clear()
+    ipLoginAttempts.clear()
+
+    return res.json({
+      message: 'All accounts deleted successfully',
+      deletedUsers: userResult.deletedCount || 0,
+      deletedTransactions: transactionResult.deletedCount || 0,
+    })
+  } catch (error) {
+    return res.status(500).json({ message: error.message || 'Unable to delete all accounts' })
   }
 })
 

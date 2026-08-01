@@ -31,13 +31,13 @@ function Register() {
   const isPasswordStrong = passedChecksCount === 4
   const canSubmit = isPasswordStrong && passwordsMatch
 
-  const fulfilledRules = [
-    passwordChecks.minLength && 'At least 8 characters',
-    passwordChecks.uppercase && 'At least 1 uppercase letter',
-    passwordChecks.number && 'At least 1 number',
-    passwordChecks.symbol && 'At least 1 symbol',
-    passwordsMatch && 'Confirm password matches',
-  ].filter(Boolean)
+  const passwordRules = [
+    { label: 'At least 8 characters', met: passwordChecks.minLength },
+    { label: 'At least 1 uppercase letter', met: passwordChecks.uppercase },
+    { label: 'At least 1 number', met: passwordChecks.number },
+    { label: 'At least 1 symbol', met: passwordChecks.symbol },
+    { label: 'Confirm password matches', met: passwordsMatch },
+  ]
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -151,12 +151,15 @@ function Register() {
               <span className="password-strength-fill" style={{ width: `${strengthPercent}%` }} />
             </div>
             <p className="password-strength-label">
-              Password strength: {isPasswordStrong ? 'Strong' : 'Needs improvement'}
+              Password strength: {isPasswordStrong ? 'Strong' : passedChecksCount > 0 ? 'Getting there' : 'Start typing'}
+            </p>
+            <p className="auth-notice">
+              Use a password that satisfies every item below. Checked items are already met; unchecked ones still need to be added.
             </p>
             <ul className="password-rules">
-              {fulfilledRules.map((rule) => (
-                <li key={rule} className="is-valid">
-                  {rule}
+              {passwordRules.map((rule) => (
+                <li key={rule.label} className={rule.met ? 'is-valid' : 'is-pending'}>
+                  {rule.label}
                 </li>
               ))}
             </ul>

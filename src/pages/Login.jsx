@@ -147,7 +147,7 @@ function Login() {
     if (isSubmitting || lockSeconds > 0) {
       return
     }
-
+    
     setErrorMessage('')
     setLoginPin((currentPin) => (currentPin.length < 6 ? `${currentPin}${digit}` : currentPin))
   }
@@ -180,7 +180,7 @@ function Login() {
     }
 
     setErrorMessage('')
-    setSuccessMessage('')
+    setSuccessMessage('')   
     setIsSubmitting(true)
 
     try {
@@ -373,6 +373,7 @@ function Login() {
                 <label>Enter 6-digit login PIN</label>
                 <PinInput
                   length={6}
+                  value={loginPin}
                   onChange={setLoginPin}
                 />
               </div>
